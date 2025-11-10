@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nursing Prometric Test Portal</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #eef5f5;
+    text-align: center;
+    margin: 0;
+    padding: 50px 0;
+}
+h1 {
+    color: #007b83;
+}
+button {
+    width: 250px;
+    padding: 15px;
+    margin: 15px 0;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+}
+#demoTest {
+    background-color: #28a745;
+}
+#fullTest {
+    background-color: #007b83;
+}
+#fullTest:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+#errorMsg {
+    color: red;
+    margin-top: 15px;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<h1>Nursing Prometric Test Portal</h1>
+
+<button id="demoTest">1. Demo Test (FREE)</button><br>
+<button id="fullTest">2. Next Test (FULL)</button>
+
+<div id="errorMsg"></div>
+
+<script>
+// Demo Test URL
+const demoTestURL = "https://script.google.com/macros/s/YOUR_DEMO_TEST_ID/exec?action=startDemo";
+
+// Full Test URL
+const fullTestURL = "https://script.google.com/macros/s/YOUR_FULL_TEST_ID/exec?action=startFull";
+
+// Example: You can control access (true/false)
+let hasFullAccess = false; // Change to true when user is allowed
+
+// Demo Test button
+document.getElementById('demoTest').onclick = () => {
+    window.location.href = demoTestURL;
+};
+
+// Full Test button
+const fullBtn = document.getElementById('fullTest');
+fullBtn.onclick = () => {
+    const errorMsg = document.getElementById('errorMsg');
+    errorMsg.innerText = '';
+
+    if(!hasFullAccess){
+        errorMsg.innerText = "You do not have access to the full test yet!";
+        return;
+    }
+
+    // Redirect to full test
+    window.location.href = fullTestURL;
+};
+
+// Optional: disable button if no access
+if(!hasFullAccess){
+    fullBtn.disabled = false; // keep clickable to show message
+}
+</script>
+
+</body>
+</html>
