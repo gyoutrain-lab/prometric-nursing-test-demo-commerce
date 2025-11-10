@@ -10,6 +10,8 @@ body {
     background: #eef5f5;
     margin: 0;
     padding: 0;
+    position: relative;
+    min-height: 100vh;
 }
 img.landing-image {
     width: 100%;
@@ -37,30 +39,88 @@ input {
     width: 80%;
     max-width: 300px;
 }
+/* Bottom-half background image */
+.dashboard-background {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-image: url('https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/icon17%20(1).jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    opacity: 0.3;
+}
+/* Social share icons */
+.social-share {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+}
+.share-icon {
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 2px solid #007b83;
+}
 </style>
 </head>
 <body>
 
+<!-- Landing Image -->
 <img class="landing-image" src="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
 
 <h1>Welcome to Nursing Prometric Simulation Test</h1>
 <p>Try the demo first or continue to the full 500-item test to master your skills!</p>
 
+<!-- Buttons -->
 <a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
 <a class="button" href="#login-dashboard" onclick="scrollToDashboard()">🔑 Continue Full Test</a>
 
 <div id="login-dashboard" style="margin-top:50px;"></div>
 
+<!-- Bottom-half background image -->
+<div class="dashboard-background"></div>
+
+<!-- Social share icons -->
+<div class="social-share">
+    <a href="https://api.callmebot.com/whatsapp.php?phone=6285399652487&text=Hello%20Admin&apikey=ko5GpVNouu7R" target="_blank">
+        <img src="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/icon17%20(1).jpg" alt="WhatsApp Share" class="share-icon">
+    </a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https://gyoutrain-lab.github.io" target="_blank">
+        <img src="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/icon17%20(1).jpg" alt="Facebook Share" class="share-icon">
+    </a>
+</div>
+
+<!-- Audio Elements -->
+<audio id="soundLanding" src="https://www.soundjay.com/human/applause-01.mp3" preload="auto"></audio>
+<audio id="soundCorrect" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
+<audio id="soundIncorrect" src="https://www.soundjay.com/button/beep-10.mp3" preload="auto"></audio>
+<audio id="soundFinish" src="https://www.soundjay.com/human/applause-02.mp3" preload="auto"></audio>
+
 <script>
-const ADMIN_WA = "6285399652487";  // Admin WhatsApp
-const CALLMEBOT_URL = "https://api.callmebot.com/whatsapp.php"; // Your CallMeBot API
+// ===== Play landing page sound =====
+window.addEventListener('load', () => {
+    document.getElementById('soundLanding').play().catch(e=>console.log("Landing sound blocked by browser"));
+});
+
+// ===== CallMeBot WhatsApp setup =====
+const ADMIN_WA = "6285399652487";  // Admin WhatsApp number
+const CALLMEBOT_KEY = "ko5GpVNouu7R";  // Your API key
 
 function sendWAMessage(phone, message) {
-    fetch(`${CALLMEBOT_URL}?phone=${phone}&text=${encodeURIComponent(message)}&apikey=YOUR_CALLMEBOT_KEY`)
-        .then(res => console.log("WA Sent:", message))
-        .catch(err => console.error(err));
+    const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(message)}&apikey=${CALLMEBOT_KEY}`;
+    fetch(url)
+        .then(res => console.log("WA sent:", message))
+        .catch(err => console.error("WA error:", err));
 }
 
+// ===== Dashboard workflow =====
 const dashboardContainer = document.getElementById('login-dashboard');
 
 function scrollToDashboard() {
@@ -104,8 +164,6 @@ function renderDashboardOptions() {
 
 function continueTest() {
     const user = JSON.parse(localStorage.getItem('user'));
-
-    // Send WA notification to admin automatically
     sendWAMessage(ADMIN_WA, `User ${user.name} wants to continue the full test.`);
 
     dashboardContainer.innerHTML = `
@@ -143,18 +201,30 @@ function unlockTest() {
     const unlockCode = localStorage.getItem('unlockCode');
 
     if (userCode == unlockCode) {
-        alert("Code verified! Redirecting to the full test...");
+        document.getElementById('soundFinish').play().catch(e=>console.log("Finish sound blocked"));
+        alert("🎉 Code verified! Redirecting to the full test...");
         window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/";
     } else {
-        alert("Incorrect code! Please verify with admin.");
+        document.getElementById('soundIncorrect').play();
+        alert("❌ Incorrect code! Please verify with admin.");
     }
 }
 
+// ===== Cancel button =====
 function cancelTest() {
     dashboardContainer.innerHTML = `
     <p>Your international career awaits. Master the Prometric Test wisely!</p>
     <a class="button" href="">Back to Landing</a>
     `;
+}
+
+// ===== Correct/Incorrect answer sound function =====
+function answerClicked(isCorrect){
+    if(isCorrect){
+        document.getElementById('soundCorrect').play();
+    } else {
+        document.getElementById('soundIncorrect').play();
+    }
 }
 </script>
 
