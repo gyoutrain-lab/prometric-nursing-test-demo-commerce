@@ -109,21 +109,43 @@ input {
 <audio id="soundIncorrect" src="https://www.soundjay.com/button/beep-10.mp3" preload="auto"></audio>
 <audio id="soundFinish" src="https://www.soundjay.com/human/applause-02.mp3" preload="auto"></audio>
 
+<!-- Test WhatsApp Button -->
+<div id="testWAContainer" style="margin:20px; display:none;">
+  <button class="button" onclick="testWA()">📩 Test WhatsApp API</button>
+</div>
+
 <script>
 // ===== Play landing page sound =====
 window.addEventListener('load', () => {
     document.getElementById('soundLanding').play().catch(e=>console.log("Landing sound blocked by browser"));
+    if (!localStorage.getItem('testWACompleted')) {
+        document.getElementById('testWAContainer').style.display = 'block';
+    }
 });
 
 // ===== CallMeBot WhatsApp setup =====
-const ADMIN_WA = "6285399652487";  
-const CALLMEBOT_KEY = "ko5GpVNouu7R";
+const ADMIN_WA = "6281901685253";
+const CALLMEBOT_KEY = "8298413377:AAFnKso7NlxkglqwYnJKlmjxmPUn5ID2Bgs";
 
 function sendWAMessage(phone, message) {
-    const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(message)}&apikey=${CALLMEBOT_KEY}`;
-    fetch(url)
+    fetch(`https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(message)}&apikey=${CALLMEBOT_KEY}`)
         .then(res => console.log("WA sent:", message))
         .catch(err => console.error("WA error:", err));
+}
+
+// ===== Test WhatsApp API Button =====
+function testWA() {
+    const testMessage = "✅ This is a test message from the Nursing Prometric Portal!";
+    fetch(`https://api.callmebot.com/whatsapp.php?phone=${ADMIN_WA}&text=${encodeURIComponent(testMessage)}&apikey=${CALLMEBOT_KEY}`)
+      .then(res => {
+          alert("✅ Test message sent! Check WhatsApp.");
+          document.getElementById('testWAContainer').style.display = 'none';
+          localStorage.setItem('testWACompleted', 'true');
+      })
+      .catch(err => {
+          alert("❌ Error sending test message. See console.");
+          console.error("WA error:", err);
+      });
 }
 
 // ===== Dashboard workflow =====
@@ -142,6 +164,8 @@ function renderLoginForm() {
     <input type="text" id="wa" placeholder="WhatsApp Number (optional)"><br><br>
     <button class="button" onclick="registerUser()">Register & Continue</button>
     `;
+    dashboardContainer.scrollIntoView({behavior: "smooth"});
+    showHelpButton();
 }
 
 function registerUser() {
@@ -149,10 +173,7 @@ function registerUser() {
     const password = document.getElementById('password').value;
     const wa = document.getElementById('wa').value;
 
-    if (!name || !password) {
-        alert("Please fill name and password!");
-        return;
-    }
+    if (!name || !password) { alert("Please fill name and password!"); return; }
 
     localStorage.setItem('user', JSON.stringify({ name, password, wa }));
     renderDashboardOptions();
@@ -167,50 +188,78 @@ function renderDashboardOptions() {
         <button class="button" onclick="cancelTest()">2. Cancel</button>
         <div id="social-share-buttons" style="margin-top:20px;">
             <p>Share this portal with friends:</p>
-            <a class="button" href="https://api.whatsapp.com/send?text=Check%20out%20the%20Nursing%20Prometric%20Test%20Portal%20https://gyoutrain-lab.github.io" target="_blank">Share on WhatsApp</a>
+            <a class="button" href="https://api.whatsapp.com/send?text=Check%20out%20the%20Nursing%20Prometric%20Test Portal%20https://gyoutrain-lab.github.io" target="_blank">Share on WhatsApp</a>
             <a class="button" href="https://www.facebook.com/sharer/sharer.php?u=https://gyoutrain-lab.github.io" target="_blank">Share on Facebook</a>
         </div>
     `;
+    dashboardContainer.scrollIntoView({behavior: "smooth"});
+    showHelpButton();
 }
 
+// ===== Dynamically add floating Help WA button =====
+function showHelpButton() {
+    if (!document.getElementById('helpWA')) {
+        const helpButton = document.createElement('a');
+        helpButton.id = 'helpWA';
+        helpButton.href = `https://api.callmebot.com/whatsapp.php?phone=${ADMIN_WA}&text=Hello%20Admin%2C%20I%20need%20help.&apikey=${CALLMEBOT_KEY}`;
+        helpButton.target = "_blank";
+        helpButton.innerHTML = '💬 Help / Contact Admin';
+        helpButton.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 16px;
+            z-index: 999;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        `;
+        helpButton.onmouseover = () => helpButton.style.background = '#128C7E';
+        helpButton.onmouseout = () => helpButton.style.background = '#25D366';
+        document.body.appendChild(helpButton);
+    }
+}
+
+// ===== Continue Test Flow =====
 function continueTest() {
     const user = JSON.parse(localStorage.getItem('user'));
     sendWAMessage(ADMIN_WA, `User ${user.name} wants to continue the full test.`);
-
     dashboardContainer.innerHTML = `
     <p>Step 1: Send IDR 50k to OVO #${ADMIN_WA}</p>
     <button class="button" onclick="paymentDone()">Payment Done</button>
     `;
+    dashboardContainer.scrollIntoView({behavior: "smooth"});
 }
 
 function paymentDone() {
     const user = JSON.parse(localStorage.getItem('user'));
     sendWAMessage(ADMIN_WA, `User ${user.name} has completed the transfer. Please verify.`);
-
     dashboardContainer.innerHTML = `
     <p>Step 2: Wait for admin verification...</p>
     <button class="button" onclick="adminVerify()">Admin Verification (Simulate)</button>
     `;
+    dashboardContainer.scrollIntoView({behavior: "smooth"});
 }
 
 function adminVerify() {
     const unlockCode = Math.floor(100000 + Math.random() * 900000);
     localStorage.setItem('unlockCode', unlockCode);
-
     const user = JSON.parse(localStorage.getItem('user'));
     sendWAMessage(user.wa || ADMIN_WA, `Your special unlock code: ${unlockCode}`);
-
     dashboardContainer.innerHTML = `
     <p>Step 3: Enter the unlock code to access the full test</p>
     <input type="text" id="userCode" placeholder="Enter Special Code">
     <button class="button" onclick="unlockTest()">Unlock Test</button>
     `;
+    dashboardContainer.scrollIntoView({behavior: "smooth"});
 }
 
 function unlockTest() {
     const userCode = document.getElementById('userCode').value;
     const unlockCode = localStorage.getItem('unlockCode');
-
     if (userCode == unlockCode) {
         document.getElementById('soundFinish').play().catch(e=>console.log("Finish sound blocked"));
         alert("🎉 Code verified! Redirecting to the full test...");
@@ -226,6 +275,7 @@ function cancelTest() {
     <p>Your international career awaits. Master the Prometric Test wisely!</p>
     <a class="button" href="">Back to Landing</a>
     `;
+    dashboardContainer.scrollIntoView({behavior: "smooth"});
 }
 
 function answerClicked(isCorrect){
@@ -239,4 +289,3 @@ function answerClicked(isCorrect){
 
 </body>
 </html>
-
