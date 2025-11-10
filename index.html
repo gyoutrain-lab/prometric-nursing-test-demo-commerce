@@ -3,6 +3,19 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nursing Prometric Test Portal</title>
+
+<!-- ===== Open Graph / Social Media Thumbnail ===== -->
+<meta property="og:title" content="Nursing Prometric Test Portal">
+<meta property="og:description" content="Try the demo or unlock the full 500-item Nursing Prometric Simulation Test with rationale!">
+<meta property="og:image" content="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/icon17%20(1).jpg">
+<meta property="og:url" content="https://gyoutrain-lab.github.io">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nursing Prometric Test Portal">
+<meta name="twitter:description" content="Try the demo or unlock the full 500-item Nursing Prometric Simulation Test with rationale!">
+<meta name="twitter:image" content="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/icon17%20(1).jpg">
+
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -39,7 +52,7 @@ input {
     width: 80%;
     max-width: 300px;
 }
-/* Bottom-half background image */
+/* Bottom-half dashboard background */
 .dashboard-background {
     position: absolute;
     bottom: 0;
@@ -51,22 +64,6 @@ input {
     background-position: center;
     z-index: -1;
     opacity: 0.3;
-}
-/* Social share icons */
-.social-share {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 20px;
-}
-.share-icon {
-    width: 60px;
-    height: 60px;
-    cursor: pointer;
-    border-radius: 10px;
-    border: 2px solid #007b83;
 }
 </style>
 </head>
@@ -86,16 +83,6 @@ input {
 
 <!-- Bottom-half background image -->
 <div class="dashboard-background"></div>
-
-<!-- Social share icons -->
-<div class="social-share">
-    <a href="https://api.callmebot.com/whatsapp.php?phone=6285399652487&text=Hello%20Admin&apikey=ko5GpVNouu7R" target="_blank">
-        <img src="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/icon17%20(1).jpg" alt="WhatsApp Share" class="share-icon">
-    </a>
-    <a href="https://www.facebook.com/sharer/sharer.php?u=https://gyoutrain-lab.github.io" target="_blank">
-        <img src="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/icon17%20(1).jpg" alt="Facebook Share" class="share-icon">
-    </a>
-</div>
 
 <!-- Audio Elements -->
 <audio id="soundLanding" src="https://www.soundjay.com/human/applause-01.mp3" preload="auto"></audio>
@@ -210,7 +197,6 @@ function unlockTest() {
     }
 }
 
-// ===== Cancel button =====
 function cancelTest() {
     dashboardContainer.innerHTML = `
     <p>Your international career awaits. Master the Prometric Test wisely!</p>
