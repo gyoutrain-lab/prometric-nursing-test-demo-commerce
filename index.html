@@ -109,43 +109,20 @@ input {
 <audio id="soundIncorrect" src="https://www.soundjay.com/button/beep-10.mp3" preload="auto"></audio>
 <audio id="soundFinish" src="https://www.soundjay.com/human/applause-02.mp3" preload="auto"></audio>
 
-<!-- Test WhatsApp Button -->
-<div id="testWAContainer" style="margin:20px; display:none;">
-  <button class="button" onclick="testWA()">📩 Test WhatsApp API</button>
-</div>
-
 <script>
 // ===== Play landing page sound =====
 window.addEventListener('load', () => {
     document.getElementById('soundLanding').play().catch(e=>console.log("Landing sound blocked by browser"));
-    if (!localStorage.getItem('testWACompleted')) {
-        document.getElementById('testWAContainer').style.display = 'block';
-    }
 });
 
-// ===== CallMeBot WhatsApp setup =====
-const ADMIN_WA = "6281901685253";
-const CALLMEBOT_KEY = "8298413377:AAFnKso7NlxkglqwYnJKlmjxmPUn5ID2Bgs";
+// ===== CallMeBot WhatsApp setup (API key corrected) =====
+const ADMIN_WA = "6281901685253";       // Your WhatsApp number registered with CallMeBot
+const CALLMEBOT_KEY = "ko5GpVNouu7R";   // Correct CallMeBot API key
 
 function sendWAMessage(phone, message) {
     fetch(`https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(message)}&apikey=${CALLMEBOT_KEY}`)
         .then(res => console.log("WA sent:", message))
         .catch(err => console.error("WA error:", err));
-}
-
-// ===== Test WhatsApp API Button =====
-function testWA() {
-    const testMessage = "✅ This is a test message from the Nursing Prometric Portal!";
-    fetch(`https://api.callmebot.com/whatsapp.php?phone=${ADMIN_WA}&text=${encodeURIComponent(testMessage)}&apikey=${CALLMEBOT_KEY}`)
-      .then(res => {
-          alert("✅ Test message sent! Check WhatsApp.");
-          document.getElementById('testWAContainer').style.display = 'none';
-          localStorage.setItem('testWACompleted', 'true');
-      })
-      .catch(err => {
-          alert("❌ Error sending test message. See console.");
-          console.error("WA error:", err);
-      });
 }
 
 // ===== Dashboard workflow =====
