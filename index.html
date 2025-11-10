@@ -1,88 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nursing Prometric Test Portal</title>
 <style>
 body {
     font-family: Arial, sans-serif;
-    background: #eef5f5;
     text-align: center;
+    background: #eef5f5;
     margin: 0;
-    padding: 50px 0;
+    padding: 0;
 }
-h1 {
-    color: #007b83;
+img.landing-image {
+    width: 100%;
+    max-height: 50vh;
+    object-fit: cover;
 }
-button {
-    width: 250px;
-    padding: 15px;
-    margin: 15px 0;
-    font-size: 18px;
-    border-radius: 10px;
+.button {
+    display: inline-block;
+    padding: 15px 25px;
+    margin: 15px;
+    background-color: #007b83;
+    color: white;
     border: none;
     cursor: pointer;
-    color: #fff;
+    font-size: 16px;
+    border-radius: 8px;
+    text-decoration: none;
 }
-#demoTest {
-    background-color: #28a745;
+.button:hover {
+    background-color: #005f63;
 }
-#fullTest {
-    background-color: #007b83;
-}
-#fullTest:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-#errorMsg {
-    color: red;
-    margin-top: 15px;
-    font-weight: bold;
+input {
+    padding: 10px;
+    margin: 5px;
+    width: 80%;
+    max-width: 300px;
 }
 </style>
 </head>
 <body>
 
-<h1>Nursing Prometric Test Portal</h1>
+<img class="landing-image" src="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
 
-<button id="demoTest">1. Demo Test (FREE)</button><br>
-<button id="fullTest">2. Next Test (FULL)</button>
+<h1>Welcome to Nursing Prometric Simulation Test</h1>
+<p>Try the demo first or continue to the full 500-item test to master your skills!</p>
 
-<div id="errorMsg"></div>
+<a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
+<a class="button" href="#login-dashboard" onclick="scrollToDashboard()">🔑 Continue Full Test</a>
+
+<div id="login-dashboard" style="margin-top:50px;"></div>
 
 <script>
-// Demo Test URL
-const demoTestURL = "https://script.google.com/macros/s/YOUR_DEMO_TEST_ID/exec?action=startDemo";
+const ADMIN_WA = "6285399652487";  // Admin WhatsApp
+const CALLMEBOT_URL = "https://api.callmebot.com/whatsapp.php"; // Your CallMeBot API
 
-// Full Test URL
-const fullTestURL = "https://script.google.com/macros/s/YOUR_FULL_TEST_ID/exec?action=startFull";
+function sendWAMessage(phone, message) {
+    fetch(`${CALLMEBOT_URL}?phone=${phone}&text=${encodeURIComponent(message)}&apikey=YOUR_CALLMEBOT_KEY`)
+        .then(res => console.log("WA Sent:", message))
+        .catch(err => console.error(err));
+}
 
-// Example: You can control access (true/false)
-let hasFullAccess = false; // Change to true when user is allowed
+const dashboardContainer = document.getElementById('login-dashboard');
 
-// Demo Test button
-document.getElementById('demoTest').onclick = () => {
-    window.location.href = demoTestURL;
-};
+function scrollToDashboard() {
+    dashboardContainer.scrollIntoView({behavior: "smooth"});
+    renderLoginForm();
+}
 
-// Full Test button
-const fullBtn = document.getElementById('fullTest');
-fullBtn.onclick = () => {
-    const errorMsg = document.getElementById('errorMsg');
-    errorMsg.innerText = '';
+function renderLoginForm() {
+    dashboardContainer.innerHTML = `
+    <h2>Login / Register</h2>
+    <input type="text" id="name" placeholder="Full Name"><br><br>
+    <input type="password" id="password" placeholder="Password"><br><br>
+    <input type="text" id="wa" placeholder="WhatsApp Number (optional)"><br><br>
+    <button class="button" onclick="registerUser()">Register & Continue</button>
+    `;
+}
 
-    if(!hasFullAccess){
-        errorMsg.innerText = "You do not have access to the full test yet!";
+function registerUser() {
+    const name = document.getElementById('name').value;
+    const password = document.getElementById('password').value;
+    const wa = document.getElementById('wa').value;
+
+    if (!name || !password) {
+        alert("Please fill name and password!");
         return;
     }
 
-    // Redirect to full test
-    window.location.href = fullTestURL;
-};
+    localStorage.setItem('user', JSON.stringify({ name, password, wa }));
+    renderDashboardOptions();
+}
 
-// Optional: disable button if no access
-if(!hasFullAccess){
-    fullBtn.disabled = false; // keep clickable to show message
+function renderDashboardOptions() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    dashboardContainer.innerHTML = `
+    <h2>Welcome, ${user.name}</h2>
+    <p>Choose an option:</p>
+    <button class="button" onclick="continueTest()">1. Continue Test</button>
+    <button class="button" onclick="cancelTest()">2. Cancel</button>
+    `;
+}
+
+function continueTest() {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    // Send WA notification to admin automatically
+    sendWAMessage(ADMIN_WA, `User ${user.name} wants to continue the full test.`);
+
+    dashboardContainer.innerHTML = `
+    <p>Step 1: Send IDR 50k to OVO #${ADMIN_WA}</p>
+    <button class="button" onclick="paymentDone()">Payment Done</button>
+    `;
+}
+
+function paymentDone() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    sendWAMessage(ADMIN_WA, `User ${user.name} has completed the transfer. Please verify.`);
+
+    dashboardContainer.innerHTML = `
+    <p>Step 2: Wait for admin verification...</p>
+    <button class="button" onclick="adminVerify()">Admin Verification (Simulate)</button>
+    `;
+}
+
+function adminVerify() {
+    const unlockCode = Math.floor(100000 + Math.random() * 900000);
+    localStorage.setItem('unlockCode', unlockCode);
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    sendWAMessage(user.wa || ADMIN_WA, `Your special unlock code: ${unlockCode}`);
+
+    dashboardContainer.innerHTML = `
+    <p>Step 3: Enter the unlock code to access the full test</p>
+    <input type="text" id="userCode" placeholder="Enter Special Code">
+    <button class="button" onclick="unlockTest()">Unlock Test</button>
+    `;
+}
+
+function unlockTest() {
+    const userCode = document.getElementById('userCode').value;
+    const unlockCode = localStorage.getItem('unlockCode');
+
+    if (userCode == unlockCode) {
+        alert("Code verified! Redirecting to the full test...");
+        window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/";
+    } else {
+        alert("Incorrect code! Please verify with admin.");
+    }
+}
+
+function cancelTest() {
+    dashboardContainer.innerHTML = `
+    <p>Your international career awaits. Master the Prometric Test wisely!</p>
+    <a class="button" href="">Back to Landing</a>
+    `;
 }
 </script>
 
