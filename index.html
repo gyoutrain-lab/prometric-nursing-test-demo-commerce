@@ -115,14 +115,14 @@ window.addEventListener('load', () => {
     document.getElementById('soundLanding').play().catch(e=>console.log("Landing sound blocked by browser"));
 });
 
-// ===== CallMeBot WhatsApp setup (API key corrected) =====
-const ADMIN_WA = "6281901685253";       // Your WhatsApp number registered with CallMeBot
-const CALLMEBOT_KEY = "ko5GpVNouu7R";   // Correct CallMeBot API key
+// ===== Telegram Bot setup for Help button =====
+const TELEGRAM_BOT_TOKEN = "8298413377:AAFnKso7NlxkglqwYnJKlmjxmPUn5ID2Bgs";
+const TELEGRAM_CHAT_ID = "<your-admin-chat-id>"; // <-- replace with your Telegram chat ID
 
-function sendWAMessage(phone, message) {
-    fetch(`https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(message)}&apikey=${CALLMEBOT_KEY}`)
-        .then(res => console.log("WA sent:", message))
-        .catch(err => console.error("WA error:", err));
+function sendTelegramMessage(message){
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`)
+      .then(res => console.log("Telegram sent:", message))
+      .catch(err => console.error("Telegram error:", err));
 }
 
 // ===== Dashboard workflow =====
@@ -173,29 +173,29 @@ function renderDashboardOptions() {
     showHelpButton();
 }
 
-// ===== Dynamically add floating Help WA button =====
+// ===== Floating Help Button for Telegram =====
 function showHelpButton() {
-    if (!document.getElementById('helpWA')) {
-        const helpButton = document.createElement('a');
-        helpButton.id = 'helpWA';
-        helpButton.href = `https://api.callmebot.com/whatsapp.php?phone=${ADMIN_WA}&text=Hello%20Admin%2C%20I%20need%20help.&apikey=${CALLMEBOT_KEY}`;
-        helpButton.target = "_blank";
+    if (!document.getElementById('helpTelegram')) {
+        const helpButton = document.createElement('button');
+        helpButton.id = 'helpTelegram';
         helpButton.innerHTML = '💬 Help / Contact Admin';
         helpButton.style.cssText = `
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #25D366;
+            background: #0088cc;
             color: white;
             padding: 12px 18px;
             border-radius: 50px;
-            text-decoration: none;
+            border: none;
+            cursor: pointer;
             font-size: 16px;
             z-index: 999;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         `;
-        helpButton.onmouseover = () => helpButton.style.background = '#128C7E';
-        helpButton.onmouseout = () => helpButton.style.background = '#25D366';
+        helpButton.onmouseover = () => helpButton.style.background = '#005f80';
+        helpButton.onmouseout = () => helpButton.style.background = '#0088cc';
+        helpButton.onclick = () => sendTelegramMessage("Hello Admin, I need help.");
         document.body.appendChild(helpButton);
     }
 }
@@ -203,9 +203,9 @@ function showHelpButton() {
 // ===== Continue Test Flow =====
 function continueTest() {
     const user = JSON.parse(localStorage.getItem('user'));
-    sendWAMessage(ADMIN_WA, `User ${user.name} wants to continue the full test.`);
+    sendTelegramMessage(`User ${user.name} wants to continue the full test.`);
     dashboardContainer.innerHTML = `
-    <p>Step 1: Send IDR 50k to OVO #${ADMIN_WA}</p>
+    <p>Step 1: Send IDR 50k to OVO #${user.wa || 'Your OVO Number'}</p>
     <button class="button" onclick="paymentDone()">Payment Done</button>
     `;
     dashboardContainer.scrollIntoView({behavior: "smooth"});
@@ -213,7 +213,7 @@ function continueTest() {
 
 function paymentDone() {
     const user = JSON.parse(localStorage.getItem('user'));
-    sendWAMessage(ADMIN_WA, `User ${user.name} has completed the transfer. Please verify.`);
+    sendTelegramMessage(`User ${user.name} has completed the transfer. Please verify.`);
     dashboardContainer.innerHTML = `
     <p>Step 2: Wait for admin verification...</p>
     <button class="button" onclick="adminVerify()">Admin Verification (Simulate)</button>
@@ -225,7 +225,7 @@ function adminVerify() {
     const unlockCode = Math.floor(100000 + Math.random() * 900000);
     localStorage.setItem('unlockCode', unlockCode);
     const user = JSON.parse(localStorage.getItem('user'));
-    sendWAMessage(user.wa || ADMIN_WA, `Your special unlock code: ${unlockCode}`);
+    sendTelegramMessage(`User ${user.name}, your special unlock code: ${unlockCode}`);
     dashboardContainer.innerHTML = `
     <p>Step 3: Enter the unlock code to access the full test</p>
     <input type="text" id="userCode" placeholder="Enter Special Code">
