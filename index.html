@@ -69,15 +69,25 @@ input {
 <div class="dashboard-background"></div>
 
 <script>
-// ✅ CONNECTED TO YOUR REAL BACKEND (SAFE + FIXED)
-const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbz-TBcHR35pNu1JO0JrftEz9xY48oog4Jl5ro0_3q1zGXgoQO61Mi8m_AFnoiJKsDi-/exec';
+/* ✅ CONFIGURE YOUR REAL BACKEND DEPLOYMENT URL HERE */
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzRFRIvwGAGcAdHjMz7tm_MkCabjl2SP0hzibg00foxOW6Uzy6dI4XpM7rDz6sV122I/exec";
 
-// --- MAIN ENTRY ---
-document.getElementById('continueFullTestButton').addEventListener('click', () => renderLoginForm());
+/* ✅ SAFELY CHECK BACKEND STATUS ON LOAD */
+window.addEventListener("load", async () => {
+  try {
+    const test = await fetch(BACKEND_URL + "?ping=true", { method: "GET" });
+    if (test.ok) console.log("✅ Backend online");
+    else console.warn("⚠️ Backend returned error:", test.status);
+  } catch (err) {
+    console.error("❌ Backend not reachable:", err);
+  }
+});
 
-// --- RENDER LOGIN / REGISTER FORM ---
+document.getElementById("continueFullTestButton").addEventListener("click", () => renderLoginForm());
+
+/* --- RENDER LOGIN FORM --- */
 function renderLoginForm() {
-  document.getElementById('login-dashboard').innerHTML = `
+  document.getElementById("login-dashboard").innerHTML = `
     <h2>Login / Register</h2>
     <input type="text" id="name" placeholder="Full Name"><br><br>
     <input type="password" id="password" placeholder="Password"><br><br>
@@ -86,32 +96,32 @@ function renderLoginForm() {
   `;
 }
 
-// --- REGISTER USER ---
+/* --- REGISTER USER --- */
 async function registerUser() {
-  const name = document.getElementById('name').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const telegram = document.getElementById('telegram').value.trim();
+  const name = document.getElementById("name").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const telegram = document.getElementById("telegram").value.trim();
 
   if (!name || !password || !telegram) {
-    alert('Please fill all fields');
+    alert("Please fill all fields");
     return;
   }
 
-  const userId = 'u_' + Date.now();
-  localStorage.setItem('user', JSON.stringify({ name, password, telegram, userId }));
+  const userId = "u_" + Date.now();
+  localStorage.setItem("user", JSON.stringify({ name, password, telegram, userId }));
 
-  const response = await sendToBackend('register', { name, telegram, password, userId });
+  const response = await sendToBackend("register", { name, telegram, password, userId });
   if (response && response.ok) {
     renderDashboardOptions();
   } else {
-    alert(response?.message || 'Registration failed. Try again.');
+    alert(response?.message || "Registration failed. Try again.");
   }
 }
 
-// --- DASHBOARD OPTIONS ---
+/* --- DASHBOARD OPTIONS --- */
 function renderDashboardOptions() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  document.getElementById('login-dashboard').innerHTML = `
+  const user = JSON.parse(localStorage.getItem("user"));
+  document.getElementById("login-dashboard").innerHTML = `
     <h2>Welcome, ${user.name}</h2>
     <p>Choose an option:</p>
     <button class="button" onclick="continueTest()">1. Continue Test</button>
@@ -119,24 +129,24 @@ function renderDashboardOptions() {
   `;
 }
 
-// --- PAYMENT CLAIM ---
+/* --- PAYMENT CLAIM --- */
 function continueTest() {
-  document.getElementById('login-dashboard').innerHTML = `
+  document.getElementById("login-dashboard").innerHTML = `
     <p>Step 1: Send IDR 50k to OVO #(+6281901685253)</p>
     <button class="button" onclick="paymentDone()">Payment Done</button>
   `;
 }
 
-// --- SEND PAYMENT CLAIM TO BACKEND ---
+/* --- SEND PAYMENT CLAIM TO BACKEND --- */
 async function paymentDone() {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   const payload = { name: user.name, telegram: user.telegram, userId: user.userId };
 
-  const response = await sendToBackend('paymentClaim', payload);
+  const response = await sendToBackend("paymentClaim", payload);
 
   if (response && response.ok) {
-    alert('Payment claim sent to admin. Admin will receive a secure link and generate the unlock code.');
-    document.getElementById('login-dashboard').innerHTML = `
+    alert("Payment claim sent to admin. Admin will receive a secure link and generate the unlock code.");
+    document.getElementById("login-dashboard").innerHTML = `
       <p>Step 2: Waiting for admin verification...</p>
       <p>Admin will generate a secure unlock code and pass it to you.</p>
       <p>Enter Special Code</p>
@@ -144,60 +154,56 @@ async function paymentDone() {
       <button class="button" onclick="submitUnlock()">Unlock Test</button>
     `;
   } else {
-    alert('Failed to send claim: ' + (response?.error || 'unknown'));
+    alert("Failed to send claim: " + (response?.error || "unknown"));
   }
 }
 
-// --- VERIFY UNLOCK CODE ---
+/* --- VERIFY UNLOCK CODE --- */
 async function submitUnlock() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  const code = document.getElementById('userCode').value.trim();
+  const user = JSON.parse(localStorage.getItem("user"));
+  const code = document.getElementById("userCode").value.trim();
 
   if (!code) {
-    alert('Please enter code');
+    alert("Please enter code");
     return;
   }
 
-  const response = await sendToBackend('verifyCode', { userId: user.userId, code });
+  const response = await sendToBackend("verifyCode", { userId: user.userId, code });
 
   if (response && response.ok) {
-    alert('🎉 Code verified! Redirecting...');
-    window.location.href = 'https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/';
+    alert("🎉 Code verified! Redirecting...");
+    window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/";
   } else {
-    alert('Invalid code. Please verify with admin.');
+    alert("Invalid code. Please verify with admin.");
   }
 }
 
-// --- CANCEL ---
+/* --- CANCEL --- */
 function cancelTest() {
-  document.getElementById('login-dashboard').innerHTML = '<p>Back to Landing</p>';
+  document.getElementById("login-dashboard").innerHTML = "<p>Back to Landing</p>";
 }
 
-// --- UNIVERSAL FETCH HANDLER (CORS SAFE) ---
+/* --- UNIVERSAL FETCH HANDLER --- */
 async function sendToBackend(action, payload = {}) {
   try {
     const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      mode: "cors",
       body: JSON.stringify({ action, ...payload }),
-      mode: 'cors',
     });
 
-    if (!response.ok) {
-      console.error('HTTP error:', response.status);
-      throw new Error('HTTP ' + response.status);
-    }
+    if (!response.ok) throw new Error("HTTP " + response.status);
 
     const data = await response.json();
-    console.log('✅ Backend response:', data);
+    console.log("✅ Backend response:", data);
     return data;
   } catch (error) {
-    console.error('❌ Network or backend error:', error);
-    alert('Network error while contacting backend. Please check your connection or try again later.');
+    console.error("❌ Network or backend error:", error);
+    alert("Network error while contacting backend. Please check your connection or try again later.");
     return null;
   }
 }
 </script>
-
 </body>
 </html>
