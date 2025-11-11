@@ -1,215 +1,95 @@
-/*
-Full Google Apps Script backend for Nursing Prometric Test Portal
-Project: NursingPrometricBackend
-Features included (defaults set):
-- Google Sheet logging (Payments & Codes & Subscriptions)
-- Unlock code expiration (30 minutes default)
-- Multi-admin support (ADMIN_CHAT_IDS script property, comma separated)
-- Subscription system (30-day subscriptions)
-- Admin dashboard (simple HTML) protected by ADMIN_DASHBOARD_TOKEN
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nursing Prometric Test Portal</title>
+<style>body{font-family:Arial;text-align:center;background:#eef5f5;margin:0;padding:0}img.landing-image{width:100%;max-height:50vh;object-fit:cover}.button{display:inline-block;padding:15px 25px;margin:15px;background-color:#007b83;color:white;border:none;cursor:pointer;font-size:16px;border-radius:8px;text-decoration:none;min-width:140px}.button:hover{background-color:#005f63}input{padding:10px;margin:5px;width:80%;max-width:300px;font-size:16px}.dashboard-background{position:absolute;bottom:0;left:0;width:100%;height:50%;background-image:url('https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg');background-size:cover;background-position:center;z-index:-1;opacity:0.3}</style>
+</head>
+<body>
+<img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
+<h1>Welcome to Nursing Prometric Simulation Test</h1>
+<p>Try the demo first or continue to the full 500-item test to master your skills!</p>
+<a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
+<a class="button" id="continueFullTestButton">🔑 Continue Full Test</a>
+<div id="login-dashboard" style="margin-top:50px"></div>
+<div class="dashboard-background"></div>
 
-Important: After deploy, set Script Properties:
-- BOT_TOKEN = your bot token
-- ADMIN_CHAT_IDS = 7360795604      (comma separated list if multiple)
-- WEB_APP_URL = https://script.google.com/macros/s/DEPLOY_ID/exec
-- SHEET_ID = (ID of Google Sheet to log data)
-- ADMIN_DASHBOARD_TOKEN = a secret token string (eg: supersecret123)
-- CODE_EXPIRY_MINUTES = 30
-- SUBSCRIPTION_DAYS = 30
+<script>
+// Replace this URL after you deploy the backend
+const BACKEND_URL = 'https://script.google.com/macros/s/YOUR_DEPLOY_ID/exec';
 
-Endpoints (POST JSON):
-- action=paymentClaim  {name,telegram,userId}
-- action=verifyCode    {userId,code}
-- action=createSubscription {userId,name,telegram}
-- GET ?action=generateCode&token=ADMIN_TOKEN  (admin clicks secure link from Telegram)
-- GET ?admin=true&token=ADMIN_DASHBOARD_TOKEN  -> admin HTML dashboard
+document.getElementById('continueFullTestButton').addEventListener('click', ()=>renderLoginForm());
 
-Security notes:
-- BOT_TOKEN never exposed to front-end. Use Script Properties.
-- Admin generation link uses one-time token stored server-side and removed after use.
-*/
-
-const PROP = {
-  BOT_TOKEN: 'BOT_TOKEN',
-  ADMIN_CHAT_IDS: 'ADMIN_CHAT_IDS',
-  WEB_APP_URL: 'WEB_APP_URL',
-  SHEET_ID: 'SHEET_ID',
-  ADMIN_DASHBOARD_TOKEN: 'ADMIN_DASHBOARD_TOKEN',
-  CODE_EXPIRY_MINUTES: 'CODE_EXPIRY_MINUTES',
-  SUBSCRIPTION_DAYS: 'SUBSCRIPTION_DAYS'
-};
-
-function doGet(e){
-  if (e.parameter && e.parameter.action === 'generateCode' && e.parameter.token) {
-    return handleGenerateCode(e.parameter.token);
-  }
-  if (e.parameter && e.parameter.admin === 'true' && e.parameter.token) {
-    return renderAdminDashboard(e.parameter.token);
-  }
-  return ContentService.createTextOutput('NursingPrometricBackend running.');
+function renderLoginForm(){
+  document.getElementById('login-dashboard').innerHTML = `
+    <h2>Login / Register</h2>
+    <input type="text" id="name" placeholder="Full Name"><br><br>
+    <input type="password" id="password" placeholder="Password"><br><br>
+    <input type="text" id="telegram" placeholder="Your Telegram Username or Chat ID"><br><br>
+    <button class="button" onclick="registerUser()">Register & Continue</button>
+  `;
 }
 
-function doPost(e){
-  const params = e.postData && e.postData.type === 'application/json' ? JSON.parse(e.postData.contents) : e.parameter;
-  const action = params.action;
-  if (action === 'paymentClaim') return paymentClaim(params);
-  if (action === 'verifyCode') return verifyCode(params);
-  if (action === 'createSubscription') return createSubscription(params);
-  return ContentService.createTextOutput(JSON.stringify({ok:false, error:'unknown action'})).setMimeType(ContentService.MimeType.JSON);
+function registerUser(){
+  const name = document.getElementById('name').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const telegram = document.getElementById('telegram').value.trim();
+  if(!name||!password||!telegram){alert('Please fill all fields');return}
+  const userId = 'u_'+Date.now();
+  localStorage.setItem('user', JSON.stringify({name,password,telegram,userId}));
+  renderDashboardOptions();
 }
 
-// -- Payment claim: create pending token, send admin secure link, log to sheet
-function paymentClaim(params){
-  const name = params.name || 'Unknown';
-  const telegram = params.telegram || '';
-  const userId = params.userId || Utilities.getUuid();
-  const timestamp = new Date().toISOString();
-
-  const adminToken = Utilities.getUuid();
-  const store = _getStore();
-  store.pending = store.pending || {};
-  store.pending[adminToken] = { userId, name, telegram, status: 'claimed', created: timestamp };
-  _setStore(store);
-
-  // log to sheet
-  _appendSheetRow(['PAYMENT_CLAIM', timestamp, userId, name, telegram, adminToken, 'pending']);
-
-  // admin link
-  const webUrl = _getProp(PROP.WEB_APP_URL);
-  if (!webUrl) return _json({ok:false, error:'WEB_APP_URL not set'});
-  const link = `${webUrl}?action=generateCode&token=${adminToken}`;
-
-  const message = `💰 Payment claim received\nName: ${name}\nTelegram: ${telegram}\n\nTo generate unlock code for this user, open this secure link (admin only):\n${link}`;
-  const tg = _sendToAdmins(message);
-  return _json({ok:true, adminToken, tg});
+function renderDashboardOptions(){
+  const user = JSON.parse(localStorage.getItem('user'));
+  document.getElementById('login-dashboard').innerHTML = `
+    <h2>Welcome, ${user.name}</h2>
+    <p>Choose an option:</p>
+    <button class="button" onclick="continueTest()">1. Continue Test</button>
+    <button class="button" onclick="cancelTest()">2. Cancel</button>
+  `;
 }
 
-function handleGenerateCode(token){
-  const store = _getStore();
-  if (!store.pending || !store.pending[token]) return ContentService.createTextOutput('Invalid or expired token.');
-  const rec = store.pending[token];
-  const now = new Date();
-  const code = String(Math.floor(100000 + Math.random() * 900000));
-  const expiryMinutes = Number(_getProp(PROP.CODE_EXPIRY_MINUTES) || 30);
-  const expiresAt = new Date(now.getTime() + expiryMinutes*60000).toISOString();
-
-  // store code under codes keyed by userId
-  store.codes = store.codes || {};
-  store.codes[rec.userId] = { code: code, name: rec.name, telegram: rec.telegram, created: now.toISOString(), expiresAt: expiresAt };
-  // remove pending token
-  delete store.pending[token];
-  _setStore(store);
-
-  // log to sheet
-  _appendSheetRow(['CODE_GENERATED', now.toISOString(), rec.userId, rec.name, rec.telegram, code, expiresAt]);
-
-  // send to admins
-  const message = `✅ Unlock Code for ${rec.name} (${rec.telegram}): ${code}\nExpires at: ${expiresAt}\nPlease pass this code to the user.`;
-  _sendToAdmins(message);
-
-  // return a friendly HTML so admin can close
-  return HtmlService.createHtmlOutput('<html><body><h3>Unlock code generated and sent to admin(s).</h3><p>You can close this tab.</p></body></html>');
+function continueTest(){
+  document.getElementById('login-dashboard').innerHTML = `
+    <p>Step 1: Send IDR 50k to OVO #(+6281901685253)</p>
+    <button class="button" onclick="paymentDone()">Payment Done</button>
+  `;
 }
 
-function verifyCode(params){
-  const userId = params.userId;
-  const code = (params.code||'').trim();
-  if(!userId||!code) return _json({ok:false,error:'missing params'});
-  const store = _getStore();
-  if (!store.codes || !store.codes[userId]) return _json({ok:false,error:'no code for user'});
-  const rec = store.codes[userId];
-  // check expiry
-  const now = new Date();
-  if (new Date(rec.expiresAt) < now) { delete store.codes[userId]; _setStore(store); _appendSheetRow(['CODE_EXPIRED', now.toISOString(), userId, rec.name, rec.telegram, rec.code]); return _json({ok:false,error:'code expired'}); }
-  if (rec.code === code) {
-    // success - consume code
-    delete store.codes[userId];
-    _setStore(store);
-    _appendSheetRow(['CODE_VERIFIED', new Date().toISOString(), userId, rec.name, rec.telegram, code]);
-    return _json({ok:true,message:'Code verified'});
-  }
-  _appendSheetRow(['CODE_FAILED', new Date().toISOString(), userId, rec.name, rec.telegram, code]);
-  return _json({ok:false,error:'invalid code'});
-}
-
-function createSubscription(params){
-  const userId = params.userId || Utilities.getUuid();
-  const name = params.name || 'Unknown';
-  const telegram = params.telegram || '';
-  const days = Number(_getProp(PROP.SUBSCRIPTION_DAYS) || 30);
-  const now = new Date();
-  const expires = new Date(now.getTime() + days*24*60*60000).toISOString();
-
-  const store = _getStore();
-  store.subscriptions = store.subscriptions || {};
-  store.subscriptions[userId] = { name, telegram, started: now.toISOString(), expiresAt: expires };
-  _setStore(store);
-
-  _appendSheetRow(['SUBSCRIPTION_CREATED', new Date().toISOString(), userId, name, telegram, expires]);
-  return _json({ok:true,expiresAt:expires});
-}
-
-// --- Admin dashboard (simple) ---
-function renderAdminDashboard(token){
-  const adminToken = _getProp(PROP.ADMIN_DASHBOARD_TOKEN);
-  if (!adminToken || token !== adminToken) return HtmlService.createHtmlOutput('Unauthorized');
-  const html = `
-    <html><body>
-    <h2>NursingPrometric Admin Dashboard</h2>
-    <p>This dashboard shows recent events and allows simple actions.</p>
-    <p>NOTE: This is a basic view. Use the Google Sheet for full logs.</p>
-    <button onclick="google.script.run.withSuccessHandler(()=>alert('Not implemented'))._dummy()">Refresh (placeholder)</button>
-    </body></html>`;
-  return HtmlService.createHtmlOutput(html);
-}
-
-function _dummy(){return}
-
-// --- Helper functions ---
-function _getStore(){
-  const raw = PropertiesService.getScriptProperties().getProperty('STORE_V2');
-  if (!raw) return {};
-  try { return JSON.parse(raw); } catch(e) { return {}; }
-}
-function _setStore(obj){ PropertiesService.getScriptProperties().setProperty('STORE_V2', JSON.stringify(obj)); }
-
-function _getProp(key){ return PropertiesService.getScriptProperties().getProperty(key); }
-
-function _sendToAdmins(text){
-  const token = _getProp(PROP.BOT_TOKEN);
-  const adminCsv = _getProp(PROP.ADMIN_CHAT_IDS) || '';
-  const admins = adminCsv.split(',').map(s=>s.trim()).filter(Boolean);
-  if (!token || admins.length===0) return {ok:false,error:'bot token or admin ids not set'};
-  const url = `https://api.telegram.org/bot${token}/sendMessage`;
-  const results = [];
-  admins.forEach(chatId => {
-    const payload = { chat_id: chatId, text: text, disable_web_page_preview: true };
-    const opts = { method:'post', contentType:'application/json', payload: JSON.stringify(payload), muteHttpExceptions:true };
-    const resp = UrlFetchApp.fetch(url, opts);
-    try{ results.push(JSON.parse(resp.getContentText())); } catch(e){ results.push({ok:false,resp:resp.getContentText()}); }
-  });
-  return results;
-}
-
-function _appendSheetRow(row){
-  const sheetId = _getProp(PROP.SHEET_ID);
-  if (!sheetId) return;
+async function paymentDone(){
+  const user = JSON.parse(localStorage.getItem('user'));
+  const payload = { action:'paymentClaim', name:user.name, telegram:user.telegram, userId:user.userId };
   try{
-    const ss = SpreadsheetApp.openById(sheetId);
-    const sh = ss.getSheetByName('Log') || ss.insertSheet('Log');
-    sh.appendRow(row);
-  } catch(e){
-    console.error('Sheet append failed', e);
-  }
+    const res = await fetch(BACKEND_URL, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const j = await res.json();
+    if(j.ok){
+      alert('Payment claim sent to admin. Admin will receive a secure link and generate the unlock code.');
+      document.getElementById('login-dashboard').innerHTML = `
+        <p>Step 2: Waiting for admin verification...</p>
+        <p>Admin will generate a secure unlock code and pass it to you.</p>
+        <p>Enter Special Code</p>
+        <input type="text" id="userCode" placeholder="Enter Special Code"><br><br>
+        <button class="button" onclick="submitUnlock()">Unlock Test</button>
+      `;
+    } else alert('Failed to send claim: '+(j.error||'unknown'));
+  }catch(e){alert('Network error while contacting backend');console.error(e)}
 }
 
-function _json(obj){ return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON); }
-
-// --- Setup helper (run once manually to set properties in code if desired) ---
-function setupDefaults(){
-  // Example to set properties programmatically (alternatively set via Project Properties UI)
-  // PropertiesService.getScriptProperties().setProperty('BOT_TOKEN', '8298413377:...');
-  // PropertiesService.getScriptProperties().setProperty('ADMIN_CHAT_IDS','7360795604');
-  // PropertiesService.getScriptProperties().setProperty('CODE_EXPIRY_MINUTES','30');
-  // PropertiesService.getScriptProperties().setProperty('SUBSCRIPTION_DAYS','30');
+async function submitUnlock(){
+  const user = JSON.parse(localStorage.getItem('user'));
+  const code = document.getElementById('userCode').value.trim();
+  if(!code){alert('Please enter code');return}
+  const payload = { action:'verifyCode', userId:user.userId, code:code };
+  try{
+    const res = await fetch(BACKEND_URL, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const j = await res.json();
+    if(j.ok){alert('🎉 Code verified! Redirecting...');window.location.href='https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/';}
+    else alert('Invalid code. Please verify with admin.');
+  }catch(e){alert('Network error while verifying code');console.error(e)}
 }
+
+function cancelTest(){document.getElementById('login-dashboard').innerHTML='<p>Back to Landing</p>'}
+</script>
+</body>
+</html>
