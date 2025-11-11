@@ -117,7 +117,7 @@ window.addEventListener('load', () => {
 
 // ===== Telegram Bot setup for Help & Admin notifications =====
 const TELEGRAM_BOT_TOKEN = "8298413377:AAFnKso7NlxkglqwYnJKlmjxmPUn5ID2Bgs";
-const TELEGRAM_CHAT_ID = "<your-admin-chat-id>"; // <-- Replace with your numeric chat ID
+const TELEGRAM_CHAT_ID = "<your-admin-chat-id>"; // <-- Replace with numeric Telegram admin chat ID
 
 function sendTelegramMessage(message){
     fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`)
@@ -138,7 +138,7 @@ function renderLoginForm() {
     <h2>Login / Register</h2>
     <input type="text" id="name" placeholder="Full Name"><br><br>
     <input type="password" id="password" placeholder="Password"><br><br>
-    <input type="text" id="wa" placeholder="WhatsApp Number (optional)"><br><br>
+    <input type="text" id="telegram" placeholder="Your Telegram Username or Chat ID"><br><br>
     <button class="button" onclick="registerUser()">Register & Continue</button>
     `;
     dashboardContainer.scrollIntoView({behavior: "smooth"});
@@ -148,11 +148,11 @@ function renderLoginForm() {
 function registerUser() {
     const name = document.getElementById('name').value;
     const password = document.getElementById('password').value;
-    const wa = document.getElementById('wa').value;
+    const telegram = document.getElementById('telegram').value;
 
-    if (!name || !password) { alert("Please fill name and password!"); return; }
+    if (!name || !password || !telegram) { alert("Please fill all fields!"); return; }
 
-    localStorage.setItem('user', JSON.stringify({ name, password, wa }));
+    localStorage.setItem('user', JSON.stringify({ name, password, telegram }));
     renderDashboardOptions();
 }
 
@@ -200,13 +200,11 @@ function showHelpButton() {
     }
 }
 
-// ===== Continue Test Flow =====
+// ===== Continue Test Flow with Telegram-verified unlock =====
 function continueTest() {
     const user = JSON.parse(localStorage.getItem('user'));
-    // ✅ Send Telegram message only if bot started and chat ID correct
-    sendTelegramMessage(`User ${user.name} wants to continue the full test.`);
     dashboardContainer.innerHTML = `
-    <p>Step 1: Send IDR 50k to OVO #${user.wa || 'Your OVO Number'}</p>
+    <p>Step 1: Send IDR 50k to OVO #(+6285399652487)</p>
     <button class="button" onclick="paymentDone()">Payment Done</button>
     `;
     dashboardContainer.scrollIntoView({behavior: "smooth"});
@@ -214,21 +212,21 @@ function continueTest() {
 
 function paymentDone() {
     const user = JSON.parse(localStorage.getItem('user'));
-    sendTelegramMessage(`User ${user.name} has completed the transfer. Please verify.`);
+    sendTelegramMessage(`💰 Payment request: ${user.name} (${user.telegram}) has completed payment. Please verify and generate unlock code.`);
     dashboardContainer.innerHTML = `
-    <p>Step 2: Wait for admin verification...</p>
+    <p>Step 2: Waiting for admin verification...</p>
     <button class="button" onclick="adminVerify()">Admin Verification (Simulate)</button>
     `;
     dashboardContainer.scrollIntoView({behavior: "smooth"});
 }
 
 function adminVerify() {
+    const user = JSON.parse(localStorage.getItem('user'));
     const unlockCode = Math.floor(100000 + Math.random() * 900000);
     localStorage.setItem('unlockCode', unlockCode);
-    const user = JSON.parse(localStorage.getItem('user'));
-    sendTelegramMessage(`User ${user.name}, your special unlock code: ${unlockCode}`);
+    sendTelegramMessage(`✅ Unlock Code for ${user.name} (${user.telegram}): ${unlockCode}`);
     dashboardContainer.innerHTML = `
-    <p>Step 3: Enter the unlock code to access the full test</p>
+    <p>Step 3: Enter the unlock code received from Telegram to access the full test</p>
     <input type="text" id="userCode" placeholder="Enter Special Code">
     <button class="button" onclick="unlockTest()">Unlock Test</button>
     `;
