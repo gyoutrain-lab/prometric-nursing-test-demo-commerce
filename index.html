@@ -2,71 +2,67 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Nursing Prometric Test — Android Full (Upgraded)</title>
-
-<!-- Improved typography -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+<title>Nursing Prometric Test — Android Friendly (Original + Upgrades)</title>
+<meta name="theme-color" content="#007b83">
 <style>
+  /* ---------- Base (keeps original look) ---------- */
   :root{
-    --accent:#007b83; --accent-2:#005f63; --bg:#eef5f5; --card:#fff; --text:#062021; --muted:#6b6b6b;
+    --accent: #007b83;
+    --accent-2: #005f63;
+    --bg: #eef5f5;
+    --card: #ffffff;
+    --text: #0a0a0a;
+    --muted: #6b6b6b;
   }
   *{box-sizing:border-box}
-  body{font-family:'Inter', Arial, sans-serif; margin:0; padding:0; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent}
+  body{font-family:Arial,system-ui; background:var(--bg); color:var(--text); margin:0; padding:0; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased;}
   a.button, button.button{display:inline-block;padding:12px 20px;margin:8px;background:var(--accent);color:#fff;border:none;border-radius:10px;cursor:pointer;text-decoration:none;font-size:16px}
   a.button:hover, button.button:hover{background:var(--accent-2)}
   .landing{padding:16px;text-align:center}
-  .landing img{width:100%;max-height:45vh;object-fit:cover;border-radius:10px;box-shadow:0 12px 30px rgba(2,12,12,0.06)}
-  h1{font-size:20px;margin:10px 0 6px}
+  .landing img{width:100%;max-height:45vh;object-fit:cover;border-radius:8px}
+  h1{font-size:20px;margin:12px 0}
   p.small{font-size:14px;color:var(--muted)}
-  .card{background:var(--card);border-radius:12px;padding:14px;margin:14px auto;max-width:760px;box-shadow:0 10px 30px rgba(3,10,12,0.06);text-align:left}
-  input[type="text"], input[type="password"], input[type="number"]{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #e6e6e6;font-size:16px}
 
-  /* Quiz layout */
-  .quiz-wrap{max-width:920px;margin:10px auto;padding:12px}
+  /* ---------- Card / Login ---------- */
+  .card{background:var(--card);border-radius:12px;padding:14px;margin:14px auto;max-width:720px;box-shadow:0 8px 30px rgba(3,10,12,0.06);text-align:left}
+  input[type="text"], input[type="password"], input[type="number"]{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #dfdfdf;font-size:16px}
+
+  /* ---------- Android-friendly question layout ---------- */
+  .quiz-wrap{max-width:900px;margin:10px auto;padding:12px}
   #quizRoot{display:none}
-  .status-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-  #timerBox,#progressBox,#subtitleBox{font-size:15px;color:var(--muted)}
-  .question-box{background:var(--card);padding:20px;border-radius:14px;box-shadow:0 10px 30px rgba(3,10,12,0.06);font-size:1.9rem;line-height:1.18;min-height:130px;margin:14px 0;transform-origin:center;transition:transform .18s ease,opacity .18s ease}
-  .options-box{background:var(--card);padding:12px;border-radius:14px;box-shadow:0 10px 30px rgba(3,10,12,0.06);font-size:1.6rem}
-  .option{display:block;width:100%;padding:16px;margin:12px 0;border-radius:12px;border:2px solid var(--accent);background:#eaf8f8;text-align:left;font-size:1.6rem;cursor:pointer;transition:transform .08s ease,box-shadow .12s}
+  .question-box{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 8px 24px rgba(3,10,12,0.06);font-size:1.75rem;line-height:1.2;min-height:110px;margin-bottom:14px;transition:transform .18s ease,opacity .18s ease}
+  .options-box{background:var(--card);padding:12px;border-radius:14px;box-shadow:0 8px 24px rgba(3,10,12,0.06);font-size:1.55rem}
+  .option{display:block;width:100%;padding:16px;margin:10px 0;border-radius:12px;border:2px solid var(--accent);background:#eaf8f8;text-align:left;font-size:1.45rem;cursor:pointer;transition:transform .08s ease,background .12s}
   .option:active{transform:scale(.997)}
-  .option.disabled{pointer-events:none;opacity:.7}
+  .option.disabled{pointer-events:none;opacity:.65}
   .controls{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .small-muted{font-size:13px;color:var(--muted)}
 
-  /* progress bar */
-  .progress-bar{height:8px;background:#e6f2f2;border-radius:999px;overflow:hidden;margin-top:8px}
-  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#00b2a3);width:0;transition:width .45s ease}
-
-  /* subtitle & rationale */
-  #subtitleBox{font-weight:600;color:var(--accent-2);margin-top:8px}
+  /* ---------- Progress / timer / subtitle / rationale ---------- */
+  .status-row{display:flex;justify-content:space-between;align-items:center;margin:6px 0;gap:8px}
+  .progress-bar{height:8px;background:#e6f2f2;border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#00b2a3);width:0;transition:width .4s ease}
+  #timerBox,#progressBox,#subtitleBox{font-size:16px;padding:6px 0}
   #rationaleBox{margin-top:14px;padding:12px;background:#fff;border-left:4px solid var(--accent);border-radius:8px;font-size:16px}
 
-  /* floating actions */
+  /* ---------- Floating Jump / Shuffle / Dark toggle ---------- */
   .float-actions{position:fixed;right:14px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:9999}
   .float-btn{width:54px;height:54px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(3,10,12,0.12);cursor:pointer;font-size:20px}
   .float-btn:hover{background:var(--accent-2)}
 
-  /* modal */
+  /* ---------- Review modal ---------- */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:10000}
   .modal .panel{background:var(--card);width:95%;max-width:880px;padding:18px;border-radius:12px;max-height:85vh;overflow:auto}
 
-  /* review list */
-  .review-row {padding:10px;border-bottom:1px solid #f1f1f1}
-
-  /* dark */
+  /* ---------- Dark mode ---------- */
   .dark{--bg:#071017;--card:#071821;--text:#e9f6f6;--muted:#93a6a6;--accent:#1aa69a;--accent-2:#138276}
   .hide{display:none}
 
-  /* animations */
-  .fade-in { animation: fadeIn .28s ease both; }
-  @keyframes fadeIn { from {opacity:0; transform:translateY(6px)} to {opacity:1; transform:translateY(0)} }
-
-  /* responsive */
+  /* ---------- Responsive ---------- */
   @media(max-width:480px){
-    .question-box{font-size:2.1rem;min-height:150px}
-    .options-box{font-size:1.9rem}
-    .option{font-size:1.9rem;padding:18px}
+    .question-box{font-size:1.95rem;min-height:150px}
+    .options-box{font-size:1.75rem}
+    .option{font-size:1.7rem;padding:18px}
     .float-actions{right:10px;bottom:12px}
   }
 </style>
@@ -74,7 +70,7 @@
 <body>
 
 <!-- Landing (original preserved) -->
-<div class="landing" id="landingArea">
+<div class="landing">
   <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
   <h1>Nursing Prometric Simulation Test</h1>
   <p class="small">Try the demo first or continue to the full 500-item test to master your skills!</p>
@@ -83,7 +79,7 @@
   <div style="margin-top:10px" class="small-muted">Original layout preserved — upgrades applied without replacing features.</div>
 </div>
 
-<!-- Dashboard area (login/register/payment/unlock) -->
+<!-- Dashboard area -->
 <div id="login-dashboard" class="card hide"></div>
 
 <!-- Quiz area -->
@@ -95,11 +91,11 @@
       <div id="subtitleBox"></div>
     </div>
 
-    <div id="questionAnim" class="fade-in">
+    <div id="questionAnim">
       <div id="questionBox" class="question-box">Loading...</div>
     </div>
 
-    <div id="optionsAnim" class="fade-in">
+    <div id="optionsAnim">
       <div id="optionsBox" class="options-box"></div>
     </div>
 
@@ -109,7 +105,10 @@
       <button class="button" id="reviewBtn" onclick="openReview()" style="display:none">Review Mode</button>
     </div>
 
-    <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+    <div style="margin-top:10px">
+      <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+    </div>
+
     <div id="rationaleBox" class="hide"></div>
   </div>
 </div>
@@ -126,7 +125,9 @@
   <div class="panel" onclick="event.stopPropagation()">
     <h3>Review Questions</h3>
     <div id="reviewContent"></div>
-    <div style="text-align:right;margin-top:8px"><button class="button" onclick="closeReview()">Close</button></div>
+    <div style="text-align:right;margin-top:8px">
+      <button class="button" onclick="closeReview()">Close</button>
+    </div>
   </div>
 </div>
 
@@ -146,49 +147,31 @@
 <audio id="sndFinish" src="https://www.soundjay.com/human/sounds/applause-3.mp3" preload="auto"></audio>
 
 <script>
-/* ========= CONFIG (unchanged) ========= */
+/* ========= CONFIG - keep original backend URL ========= */
 const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyAahjib1U3F-L1HrRDItXBKImZXZNORT7z7hyKz373wq5Xg-xGParOZlO8J4B7hjXT/exec';
 const FULL_TEST_URL = 'https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/';
 
 /* ========= STATE ========= */
 let questions = [];
-let originalQuestions = [];
+let originalQuestions = []; // for review
 let currentIndex = 0;
 let user = null;
 let shuffleMode = false;
-let answered = {}; // { idx: {selected, correct, time} }
-let allowBack = true;
+let answered = {}; // keep user's answers for review {index: {selected,correct}}
+let allowBack = true; // if false, disable going back after answering
 let timer = 0, timerInterval = null;
 
 /* ========= UI helpers ========= */
 const el = id => document.getElementById(id);
 const play = id => { try{ el(id).currentTime = 0; el(id).play(); }catch(e){} };
 
-/* ========= Anti-cheat & protections ========= */
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('copy', e => e.preventDefault());
-document.addEventListener('cut', e => e.preventDefault());
-document.addEventListener('paste', e => e.preventDefault());
-window.addEventListener('beforeunload', e => { e.preventDefault(); e.returnValue = ''; }); // warn before leaving
-// detect visibility change and log locally
-document.addEventListener('visibilitychange', () => {
-  const events = JSON.parse(localStorage.getItem('npt_events')||'[]');
-  events.push({type:'visibility', state: document.visibilityState, time:Date.now()});
-  localStorage.setItem('npt_events', JSON.stringify(events));
+/* ========= Initialize (preserve original continue button behavior) ========= */
+document.getElementById('continueFullTestButton').addEventListener('click', ()=> {
+  // show login/register area
+  renderLoginForm();
 });
 
-/* block rapid taps across whole document (anti double-submit) */
-let lastTap = 0;
-document.addEventListener('click', (ev) => {
-  const now = Date.now();
-  if (now - lastTap < 140) ev.stopImmediatePropagation();
-  lastTap = now;
-}, true);
-
-/* ========= Init: keep original 'Continue' button behavior ========= */
-el('continueFullTestButton').addEventListener('click', renderLoginForm);
-
-/* ========= Login / Register (original fields preserved) ========= */
+/* ========= Login / Register (keeps original fields) ========= */
 function renderLoginForm(){
   const box = el('login-dashboard');
   box.classList.remove('hide');
@@ -198,7 +181,9 @@ function renderLoginForm(){
       <input type="text" id="name" placeholder="Full Name"><br>
       <input type="password" id="password" placeholder="Password"><br>
       <input type="text" id="telegram" placeholder="Your Telegram Username or Chat ID"><br>
-      <div style="text-align:right;margin-top:8px"><button class="button" onclick="registerUser()">Register & Continue</button></div>
+      <div style="text-align:right;margin-top:8px">
+        <button class="button" onclick="registerUser()">Register & Continue</button>
+      </div>
     </div>
   `;
 }
@@ -227,7 +212,7 @@ function renderDashboard(){
   `;
 }
 
-/* ========= Payment Flow (original) ========= */
+/* ========= Payment Flow (original behavior) ========= */
 function startPaymentFlow(){
   el('login-dashboard').innerHTML = `
     <div class="card">
@@ -270,6 +255,7 @@ async function submitUnlock(){
     if(j.ok){
       play('sndFinish');
       alert('✅ Code verified! Starting your full test now...');
+      // start quiz in-place (no redirect)
       startQuizInPlace();
     } else {
       play('sndWrong');
@@ -278,61 +264,48 @@ async function submitUnlock(){
   }catch(e){ console.error(e); alert('Network error while verifying code'); }
 }
 
-/* ========= Start quiz in-place (fullscreen + auto-resume) ========= */
+/* ========= Quiz start (in-place) ========= */
 function startQuizInPlace(){
-  // hide landing & login
-  document.getElementById('landingArea').style.display = 'none';
+  // hide landing and login
+  document.querySelector('.landing').style.display = 'none';
   el('login-dashboard').classList.add('hide');
-
-  // show quiz
+  // show quiz root
   el('quizRoot').classList.remove('hide');
+  // init UI
   el('rationaleBox').classList.add('hide');
   el('reviewBtn').style.display = 'inline-block';
-
-  // request fullscreen (user gesture required, might be blocked on iOS)
-  try {
-    const elFS = document.documentElement;
-    if (elFS.requestFullscreen) elFS.requestFullscreen().catch(()=>{});
-    else if (elFS.webkitRequestFullscreen) elFS.webkitRequestFullscreen().catch(()=>{});
-  } catch (e) {}
-
-  // load questions (getQuestions=1) and auto-resume
-  fetchQuestions().then(()=>{ startTimer(); restoreProgress(); }).catch(err => { el('questionBox').innerText = 'Failed to load questions.'; console.error(err); });
+  // fetch questions then start
+  fetchQuestions().then(startTimer).catch(err => { el('questionBox').innerText = 'Failed to load questions.'; console.error(err); });
 }
 
-/* ========= Fetch questions ========= */
+/* ========= Fetch questions from backend (GET ?getQuestions=1) ========= */
 async function fetchQuestions(){
   el('questionBox').innerText = 'Loading questions...';
   const res = await fetch(BACKEND_URL + '?getQuestions=1');
   if(!res.ok) throw new Error('Network response not ok');
-  const data = await res.json();
+  let data = await res.json();
   if(!Array.isArray(data) || data.length === 0) throw new Error('No questions');
-  originalQuestions = JSON.parse(JSON.stringify(data));
-  questions = data.slice();
-  // ensure numbering continuous
-  questions.forEach((q,i)=> q.no = i+1);
+  originalQuestions = JSON.parse(JSON.stringify(data)); // deep copy
+  questions = data.slice(); // working array
   currentIndex = 0;
   answered = {};
-  saveProgress(); // initialize storage
+  shuffleMode = false;
   renderQuestion();
   updateProgressBar();
+  return;
 }
 
 /* ========= Timer ========= */
-function startTimer(){ timer = Number(localStorage.getItem('npt_timer')||0); el('timerBox').innerText = '⏳ ' + timer + 's'; if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(()=>{ timer++; el('timerBox').innerText = '⏳ ' + timer + 's'; localStorage.setItem('npt_timer', timer); }, 1000); }
+function startTimer(){ timer = 0; el('timerBox').innerText = '⏳ 0s'; if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(()=>{ timer++; el('timerBox').innerText = '⏳ ' + timer + 's'; }, 1000); }
 function stopTimer(){ if(timerInterval) clearInterval(timerInterval); }
 
 /* ========= Render question ========= */
 function renderQuestion(){
   if(!questions || questions.length===0){ el('questionBox').innerText = 'No questions available.'; return; }
   const q = questions[currentIndex];
-
-  el('questionBox').classList.remove('fade-in');
-  el('optionsBox').classList.remove('fade-in');
-  void el('questionBox').offsetWidth; // trigger reflow
-  void el('optionsBox').offsetWidth;
-  el('questionBox').classList.add('fade-in');
-  el('optionsBox').classList.add('fade-in');
+  // animate in
+  el('questionBox').style.opacity = 0; el('optionsBox').style.opacity = 0;
+  setTimeout(()=>{ el('questionBox').style.opacity = 1; el('optionsBox').style.opacity = 1; }, 120);
 
   el('questionBox').innerHTML = `<strong>${q.no}. ${escapeHtml(q.question)}</strong>`;
   el('subtitleBox').innerText = q.subtitle || '';
@@ -344,44 +317,37 @@ function renderQuestion(){
     b.className = 'option';
     b.innerText = opt;
     b.onclick = () => handleAnswer(i, q.correct, q.rationale);
-    // prevent double-tap
-    b.addEventListener('click', ()=>{ b.classList.add('disabled'); setTimeout(()=>b.classList.remove('disabled'), 800); });
+    // prevent double-clicking spamming
+    b.addEventListener('click', ()=>{ b.classList.add('disabled'); setTimeout(()=>b.classList.remove('disabled'), 900); });
     box.appendChild(b);
   });
 
+  // prev/next buttons
   el('prevBtn').style.display = (allowBack && currentIndex>0) ? 'inline-block' : 'none';
   el('nextBtn').style.display = 'none';
   el('progressBox').innerText = `${currentIndex + 1} / ${questions.length}`;
   updateProgressBar();
-  saveProgress();
 }
 
 /* ========= Handle answer selection ========= */
 function handleAnswer(selectedIndex, correctIndex, rationale){
-  // block quick successive answers
+  // prevent multiple selection rapid-fire
   if(el('optionsBox').querySelector('.option.disabled')) return;
-
-  // save answer
-  answered[currentIndex] = { selected: selectedIndex, correct: correctIndex, time: Date.now(), rationale: rationale || '' };
-  saveProgress();
-
-  // feedback
+  // mark answer
+  answered[currentIndex] = { selected: selectedIndex, correct: correctIndex, rationale: rationale || '' };
+  // visual feedback & sound
   if(selectedIndex === correctIndex){ play('sndCorrect'); }
   else { play('sndWrong'); }
-
   // show rationale
   el('rationaleBox').innerText = answered[currentIndex].rationale || '—';
   el('rationaleBox').classList.remove('hide');
-
+  // if back not allowed, lock previous
+  if(!allowBack) { /* nothing to do; prevBtn already hidden by render */ }
   // show next button
   el('nextBtn').style.display = 'inline-block';
   play('sndNext');
-
   // auto-advance after short delay
-  setTimeout(()=> {
-    if(currentIndex < questions.length -1){ currentIndex++; renderQuestion(); }
-    else { finishTest(); }
-  }, 600);
+  setTimeout(()=>{ if(currentIndex < questions.length -1){ currentIndex++; renderQuestion(); } else { finishTest(); } }, 600);
 }
 
 /* ========= Navigation ========= */
@@ -398,6 +364,7 @@ function finishTest(){
   el('progressBox').innerText = `Completed`;
   el('progressFill').style.width = '100%';
   play('sndFinish');
+  // show review automatically
   setTimeout(()=>openReview(), 900);
 }
 
@@ -411,21 +378,23 @@ function updateProgressBar(){
 function toggleShuffle(){
   shuffleMode = !shuffleMode;
   if(shuffleMode){
+    // Fisher–Yates shuffle on questions array but keep originalQuestions intact
     questions = originalQuestions.slice();
     for(let i = questions.length -1; i>0; i--){
       const j = Math.floor(Math.random() * (i+1));
       [questions[i], questions[j]] = [questions[j], questions[i]];
     }
+    // reassign continuous numbering after shuffle
     questions.forEach((q, idx)=> q.no = idx + 1);
     currentIndex = 0;
     alert('Shuffle ON');
   } else {
+    // restore original order
     questions = originalQuestions.slice();
     questions.forEach((q, idx)=> q.no = idx + 1);
     currentIndex = 0;
     alert('Shuffle OFF');
   }
-  saveProgress();
   renderQuestion();
 }
 
@@ -453,53 +422,16 @@ function openReview(){
     const sel = r ? r.selected : null;
     const correct = q.correct;
     const row = document.createElement('div');
-    row.className = 'review-row';
+    row.style.padding='10px';
+    row.style.borderBottom='1px solid #f1f1f1';
     row.innerHTML = `<strong>${q.no}. ${escapeHtml(q.question)}</strong>
-      <div style="margin-top:6px">Your answer: <em>${sel===null? 'Not answered' : escapeHtml(q.options[sel]||'')}</em></div>
-      <div>Correct answer: <em>${escapeHtml(q.options[correct]||'')}</em></div>
+      <div style="margin-top:6px">Your answer: <em>${sel===null? 'Not answered' : escapeHtml(q.options[sel])}</em></div>
+      <div>Correct answer: <em>${escapeHtml(q.options[correct])}</em></div>
       <div style="margin-top:6px;color:#666">${escapeHtml(q.rationale || '')}</div>`;
     cont.appendChild(row);
   });
 }
 function closeReview(e){ if(!e) el('reviewModal').style.display='none'; else if(e.target.classList.contains('modal')) el('reviewModal').style.display='none'; }
-
-/* ========= Save/Restore progress (auto-resume) ========= */
-function saveProgress(){
-  try {
-    const save = {
-      currentIndex,
-      answered,
-      timer,
-      shuffleMode,
-      timestamp: Date.now()
-    };
-    localStorage.setItem('npt_progress', JSON.stringify(save));
-  } catch (e) {}
-}
-
-function restoreProgress(){
-  try {
-    const raw = localStorage.getItem('npt_progress');
-    if(!raw) return;
-    const save = JSON.parse(raw);
-    if(save && typeof save.currentIndex === 'number'){
-      currentIndex = save.currentIndex;
-      answered = save.answered || {};
-      timer = save.timer || 0;
-      shuffleMode = !!save.shuffleMode;
-      // if shuffleMode was on, reapply shuffle (best-effort)
-      if(shuffleMode){
-        questions = originalQuestions.slice();
-        for(let i = questions.length -1; i>0; i--){
-          const j = Math.floor(Math.random() * (i+1));
-          [questions[i], questions[j]] = [questions[j], questions[i]];
-        }
-        questions.forEach((q,i)=> q.no = i+1);
-      }
-      renderQuestion();
-    }
-  } catch(e){ console.error('restore failed', e); }
-}
 
 /* ========= Utility ========= */
 function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'})[m]; }); }
@@ -508,38 +440,27 @@ function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<
 let dark = false;
 function toggleDark(){ dark = !dark; if(dark) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); }
 
-/* ========= Disable download / save UI ========= */
-// nothing visible exposes a download link; block common save keyboard shortcuts
-document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P')) { e.preventDefault(); alert('Saving is disabled'); }
-});
+/* ========= Disable saving / downloading protections ========= */
+/* Note: we cannot fully prevent screenshots or devtools, but we avoid exposing direct download links,
+   prevent right-click saving of the page content elements, and remove contenteditable attributes. */
+document.addEventListener('contextmenu', e=>{ e.preventDefault(); });
+document.addEventListener('copy', e=>{ e.preventDefault(); });
 
-/* ========= Persist session on load ========= */
+/* ========= Persist session if available ========= */
 window.addEventListener('load', ()=> {
-  try {
+  try{
     const st = localStorage.getItem('npt_user');
     if(st){ user = JSON.parse(st); renderDashboard(); }
-    // try auto-restore only if quiz was in progress
-    const raw = localStorage.getItem('npt_progress');
-    if(raw && confirm('Resume previous session?')) {
-      // show quiz UI and restore
-      document.getElementById('landingArea').style.display = 'none';
-      el('login-dashboard').classList.add('hide');
-      el('quizRoot').classList.remove('hide');
-      fetchQuestions().then(()=>{ restoreProgress(); startTimer(); }).catch(()=>{});
-    }
-  } catch(e){}
+  }catch(e){}
 });
 
-/* ========= Accessibility / shortcuts ========= */
-document.addEventListener('keydown', e => {
+/* ========= Accessibility / Shortcuts ========= */
+document.addEventListener('keydown', e=>{
   if(e.key === 'ArrowRight') nextQ();
   if(e.key === 'ArrowLeft') prevQ();
 });
 
-/* ========= Admin helpers (no exposure here) ========= */
-// nothing added — your admin process remains the same
-
+/* ========= End ========= */
 </script>
 </body>
 </html>
