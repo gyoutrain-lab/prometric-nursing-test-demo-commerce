@@ -112,12 +112,12 @@ input {
 <script>
 // ===== Play landing page sound =====
 window.addEventListener('load', () => {
-    document.getElementById('soundLanding').play().catch(e=>console.log("Landing sound blocked by browser"));
+    document.getElementById('soundLanding').play().catch(e=>console.log("Landing sound blocked"));
 });
 
-// ===== Telegram Bot setup for Help button =====
+// ===== Telegram Bot setup for Help & Admin notifications =====
 const TELEGRAM_BOT_TOKEN = "8298413377:AAFnKso7NlxkglqwYnJKlmjxmPUn5ID2Bgs";
-const TELEGRAM_CHAT_ID = "<your-admin-chat-id>"; // <-- replace with your Telegram chat ID
+const TELEGRAM_CHAT_ID = "<your-admin-chat-id>"; // <-- Replace with your numeric chat ID
 
 function sendTelegramMessage(message){
     fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`)
@@ -203,6 +203,7 @@ function showHelpButton() {
 // ===== Continue Test Flow =====
 function continueTest() {
     const user = JSON.parse(localStorage.getItem('user'));
+    // ✅ Send Telegram message only if bot started and chat ID correct
     sendTelegramMessage(`User ${user.name} wants to continue the full test.`);
     dashboardContainer.innerHTML = `
     <p>Step 1: Send IDR 50k to OVO #${user.wa || 'Your OVO Number'}</p>
