@@ -58,24 +58,21 @@ input {
 <body>
 <img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
 
-<h1>Behavioral, Ethics and Infection Control – Nursing Prometric Simulation Test</h1>
+<h1>Welcome to Nursing Prometric Simulation Test</h1>
 <p>Try the demo first or continue to the full 500-item test to master your skills!</p>
 
 <a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
 <a class="button" id="continueFullTestButton">🔑 Continue Full Test</a>
 
 <div id="login-dashboard" style="margin-top:50px"></div>
-
 <div class="dashboard-background"></div>
 
 <script>
-/* ✅ CONFIGURE YOUR REAL BACKEND DEPLOYMENT URL HERE */
+/* 🔗 Replace this URL after you deploy your Google Apps Script */
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwdlfesr6VkdJFVQwrLXzn_4o7OjRmirnc4Zg2ftvqOLJ463G_-z0_wBa1__OK6Vtc/exec";
 
-/* --- RENDER LOGIN FORM WHEN USER CLICKS --- */
-document.getElementById("continueFullTestButton").addEventListener("click", () => renderLoginForm());
+document.getElementById("continueFullTestButton").addEventListener("click", renderLoginForm);
 
-/* --- RENDER LOGIN FORM --- */
 function renderLoginForm() {
   document.getElementById("login-dashboard").innerHTML = `
     <h2>Login / Register</h2>
@@ -86,29 +83,20 @@ function renderLoginForm() {
   `;
 }
 
-/* --- REGISTER USER --- */
 async function registerUser() {
   const name = document.getElementById("name").value.trim();
   const password = document.getElementById("password").value.trim();
   const telegram = document.getElementById("telegram").value.trim();
-
-  if (!name || !password || !telegram) {
-    alert("Please fill all fields");
-    return;
-  }
+  if (!name || !password || !telegram) return alert("Please fill all fields");
 
   const userId = "u_" + Date.now();
   localStorage.setItem("user", JSON.stringify({ name, password, telegram, userId }));
 
   const response = await sendToBackend("register", { name, telegram, password, userId });
-  if (response && response.ok) {
-    renderDashboardOptions();
-  } else {
-    alert(response?.message || "Registration failed. Try again.");
-  }
+  if (response && response.ok) renderDashboardOptions();
+  else alert(response?.message || "Registration failed. Try again.");
 }
 
-/* --- DASHBOARD OPTIONS --- */
 function renderDashboardOptions() {
   const user = JSON.parse(localStorage.getItem("user"));
   document.getElementById("login-dashboard").innerHTML = `
@@ -119,7 +107,6 @@ function renderDashboardOptions() {
   `;
 }
 
-/* --- PAYMENT CLAIM --- */
 function continueTest() {
   document.getElementById("login-dashboard").innerHTML = `
     <p>Step 1: Send IDR 50k to OVO #(+6281901685253)</p>
@@ -127,18 +114,15 @@ function continueTest() {
   `;
 }
 
-/* --- SEND PAYMENT CLAIM TO BACKEND --- */
 async function paymentDone() {
   const user = JSON.parse(localStorage.getItem("user"));
   const payload = { name: user.name, telegram: user.telegram, userId: user.userId };
-
   const response = await sendToBackend("paymentClaim", payload);
 
   if (response && response.ok) {
-    alert("Payment claim sent to admin. Admin will receive a secure link and generate the unlock code.");
+    alert("Payment claim sent to admin. Admin will generate your unlock code.");
     document.getElementById("login-dashboard").innerHTML = `
       <p>Step 2: Waiting for admin verification...</p>
-      <p>Admin will generate a secure unlock code and pass it to you.</p>
       <p>Enter Special Code</p>
       <input type="text" id="userCode" placeholder="Enter Special Code"><br><br>
       <button class="button" onclick="submitUnlock()">Unlock Test</button>
@@ -148,46 +132,32 @@ async function paymentDone() {
   }
 }
 
-/* --- VERIFY UNLOCK CODE --- */
 async function submitUnlock() {
   const user = JSON.parse(localStorage.getItem("user"));
   const code = document.getElementById("userCode").value.trim();
-
-  if (!code) {
-    alert("Please enter code");
-    return;
-  }
+  if (!code) return alert("Please enter code");
 
   const response = await sendToBackend("verifyCode", { userId: user.userId, code });
-
   if (response && response.ok) {
     alert("🎉 Code verified! Redirecting...");
     window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/";
-  } else {
-    alert("Invalid code. Please verify with admin.");
-  }
+  } else alert("Invalid code. Please verify with admin.");
 }
 
-/* --- CANCEL --- */
 function cancelTest() {
   document.getElementById("login-dashboard").innerHTML = "<p>Back to Landing</p>";
 }
 
-/* --- UNIVERSAL FETCH HANDLER --- */
-/* Minimal change: use text/plain Content-Type to avoid CORS preflight,
-   and parse response via response.text() -> JSON.parse(text) */
 async function sendToBackend(action, payload = {}) {
   try {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
+      mode: "cors",
       body: JSON.stringify({ action, ...payload }),
     });
-
     const text = await response.text();
-    // sometimes Apps Script returns JSON string inside HTML, so parse text
     const data = JSON.parse(text);
-    console.log("✅ Backend response:", data);
     return data;
   } catch (error) {
     console.error("❌ Network or backend error:", error);
@@ -196,10 +166,5 @@ async function sendToBackend(action, payload = {}) {
   }
 }
 </script>
-
-<footer style="margin-top:20px;">
-  Prepared by: <b>Giyono Asfarrasyid, ETK Yogyakarta</b>
-</footer>
-
 </body>
 </html>
