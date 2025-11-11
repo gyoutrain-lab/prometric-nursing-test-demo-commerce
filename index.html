@@ -1,88 +1,205 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nursing Prometric Simulation Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nursing Prometric Test Portal</title>
+
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f6fa;
-    color: #222;
-    margin: 0;
-    padding: 0;
-  }
-  #app {
-    max-width: 800px;
-    margin: 30px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-  .info {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 10px;
-  }
-  #quizBox {
-    text-align: left;
-  }
-  footer {
-    margin-top: 30px;
-    text-align: center;
-    color: red;
-  }
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #eef5f5;
+  margin: 0;
+  padding: 0;
+}
+img.landing-image {
+  width: 100%;
+  max-height: 50vh;
+  object-fit: cover;
+}
+.button {
+  display: inline-block;
+  padding: 15px 25px;
+  margin: 15px;
+  background-color: #007b83;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  min-width: 140px;
+}
+.button:hover {
+  background-color: #005f63;
+}
+input {
+  padding: 10px;
+  margin: 5px;
+  width: 80%;
+  max-width: 300px;
+  font-size: 16px;
+}
+.dashboard-background {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background-image: url('https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg');
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  opacity: 0.3;
+}
 </style>
 </head>
-<body>
-<div id="app">
-  <h2>Behavioral, Ethics and Infection Control – Nursing Prometric Simulation Test</h2>
-  <div class="info" id="infoBox"></div>
-  <div id="quizBox"></div>
 
-  <footer>
-    Prepared by: <b>Giyono Asfarrasyid, ETK Yogyakarta</b>
-  </footer>
-</div>
+<body>
+<img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
+
+<h1>Behavioral, Ethics and Infection Control – Nursing Prometric Simulation Test</h1>
+<p>Try the demo first or continue to the full 500-item test to master your skills!</p>
+
+<a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
+<a class="button" id="continueFullTestButton">🔑 Continue Full Test</a>
+
+<div id="login-dashboard" style="margin-top:50px"></div>
+
+<div class="dashboard-background"></div>
 
 <script>
-const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxd-UbKPkn5KcKSNJAeacr4QRF90L-MIF-egcSRw6J6ppgaa1QuTo4l3XxsYU0V4Mgw/exec';
+/* ✅ CONFIGURE YOUR REAL BACKEND DEPLOYMENT URL HERE */
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwdlfesr6VkdJFVQwrLXzn_4o7OjRmirnc4Zg2ftvqOLJ463G_-z0_wBa1__OK6Vtc/exec";
 
-function submitResult(resultData) {
-  return fetch(BACKEND_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(resultData),
-    mode: 'cors'
-  })
-  .then(r => r.text())
-  .then(txt => {
-    try {
-      return JSON.parse(txt);
-    } catch {
-      console.log('Raw response:', txt);
-      throw new Error('Invalid JSON from server');
-    }
-  });
+/* --- RENDER LOGIN FORM WHEN USER CLICKS --- */
+document.getElementById("continueFullTestButton").addEventListener("click", () => renderLoginForm());
+
+/* --- RENDER LOGIN FORM --- */
+function renderLoginForm() {
+  document.getElementById("login-dashboard").innerHTML = `
+    <h2>Login / Register</h2>
+    <input type="text" id="name" placeholder="Full Name"><br><br>
+    <input type="password" id="password" placeholder="Password"><br><br>
+    <input type="text" id="telegram" placeholder="Your Telegram Username or Chat ID"><br><br>
+    <button class="button" onclick="registerUser()">Register & Continue</button>
+  `;
 }
 
-// Example usage
-document.addEventListener('DOMContentLoaded', () => {
-  const testResult = {
-    name: 'Test User',
-    score: 85,
-    correct: 17,
-    incorrect: 3,
-    timeUsed: '12m 45s',
-    status: 'PASS'
-  };
+/* --- REGISTER USER --- */
+async function registerUser() {
+  const name = document.getElementById("name").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const telegram = document.getElementById("telegram").value.trim();
 
-  // Demo sending to backend
-  submitResult(testResult)
-    .then(res => console.log('Backend response:', res))
-    .catch(err => alert('Network or backend error: ' + err.message));
-});
+  if (!name || !password || !telegram) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  const userId = "u_" + Date.now();
+  localStorage.setItem("user", JSON.stringify({ name, password, telegram, userId }));
+
+  const response = await sendToBackend("register", { name, telegram, password, userId });
+  if (response && response.ok) {
+    renderDashboardOptions();
+  } else {
+    alert(response?.message || "Registration failed. Try again.");
+  }
+}
+
+/* --- DASHBOARD OPTIONS --- */
+function renderDashboardOptions() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  document.getElementById("login-dashboard").innerHTML = `
+    <h2>Welcome, ${user.name}</h2>
+    <p>Choose an option:</p>
+    <button class="button" onclick="continueTest()">1. Continue Test</button>
+    <button class="button" onclick="cancelTest()">2. Cancel</button>
+  `;
+}
+
+/* --- PAYMENT CLAIM --- */
+function continueTest() {
+  document.getElementById("login-dashboard").innerHTML = `
+    <p>Step 1: Send IDR 50k to OVO #(+6281901685253)</p>
+    <button class="button" onclick="paymentDone()">Payment Done</button>
+  `;
+}
+
+/* --- SEND PAYMENT CLAIM TO BACKEND --- */
+async function paymentDone() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const payload = { name: user.name, telegram: user.telegram, userId: user.userId };
+
+  const response = await sendToBackend("paymentClaim", payload);
+
+  if (response && response.ok) {
+    alert("Payment claim sent to admin. Admin will receive a secure link and generate the unlock code.");
+    document.getElementById("login-dashboard").innerHTML = `
+      <p>Step 2: Waiting for admin verification...</p>
+      <p>Admin will generate a secure unlock code and pass it to you.</p>
+      <p>Enter Special Code</p>
+      <input type="text" id="userCode" placeholder="Enter Special Code"><br><br>
+      <button class="button" onclick="submitUnlock()">Unlock Test</button>
+    `;
+  } else {
+    alert("Failed to send claim: " + (response?.error || "unknown"));
+  }
+}
+
+/* --- VERIFY UNLOCK CODE --- */
+async function submitUnlock() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const code = document.getElementById("userCode").value.trim();
+
+  if (!code) {
+    alert("Please enter code");
+    return;
+  }
+
+  const response = await sendToBackend("verifyCode", { userId: user.userId, code });
+
+  if (response && response.ok) {
+    alert("🎉 Code verified! Redirecting...");
+    window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/";
+  } else {
+    alert("Invalid code. Please verify with admin.");
+  }
+}
+
+/* --- CANCEL --- */
+function cancelTest() {
+  document.getElementById("login-dashboard").innerHTML = "<p>Back to Landing</p>";
+}
+
+/* --- UNIVERSAL FETCH HANDLER --- */
+/* Minimal change: use text/plain Content-Type to avoid CORS preflight,
+   and parse response via response.text() -> JSON.parse(text) */
+async function sendToBackend(action, payload = {}) {
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action, ...payload }),
+    });
+
+    const text = await response.text();
+    // sometimes Apps Script returns JSON string inside HTML, so parse text
+    const data = JSON.parse(text);
+    console.log("✅ Backend response:", data);
+    return data;
+  } catch (error) {
+    console.error("❌ Network or backend error:", error);
+    alert("Network error while contacting backend. Please check your connection or try again later.");
+    return null;
+  }
+}
 </script>
+
+<footer style="margin-top:20px;">
+  Prepared by: <b>Giyono Asfarrasyid, ETK Yogyakarta</b>
+</footer>
+
 </body>
 </html>
