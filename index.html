@@ -2,131 +2,17 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Nursing Prometric Test — Android Friendly (Original + Upgrades)</title>
-<meta name="theme-color" content="#007b83">
+<title>Nursing Prometric Test — Android Full (Upgraded)</title>
+
+<!-- Improved typography -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-  /* ---------- Base (keeps original look) ---------- */
   :root{
-    --accent: #007b83;
-    --accent-2: #005f63;
-    --bg: #eef5f5;
-    --card: #ffffff;
-    --text: #0a0a0a;
-    --muted: #6b6b6b;
+    --accent:#007b83; --accent-2:#005f63; --bg:#eef5f5; --card:#fff; --text:#062021; --muted:#6b6b6b;
   }
   *{box-sizing:border-box}
-  body{font-family:Arial,system-ui; background:var(--bg); color:var(--text); margin:0; padding:0; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased;}
-  a.button, button.button{display:inline-block;padding:12px 20px;margin:8px;background:var(--accent);color:#fff;border:none;border-radius:10px;cursor:pointer;text-decoration:none;font-size:16px}
-  a.button:hover, button.button:hover{background:var(--accent-2)}
-  .landing{padding:16px;text-align:center}
-  .landing img{width:100%;max-height:45vh;object-fit:cover;border-radius:8px}
-  h1{font-size:20px;margin:12px 0}
-  p.small{font-size:14px;color:var(--muted)}
-
-  /* ---------- Card / Login ---------- */
-  .card{background:var(--card);border-radius:12px;padding:14px;margin:14px auto;max-width:720px;box-shadow:0 8px 30px rgba(3,10,12,0.06);text-align:left}
-  input[type="text"], input[type="password"], input[type="number"]{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #dfdfdf;font-size:16px}
-
-  /* ---------- Android-friendly question layout ---------- */
-  .quiz-wrap{max-width:900px;margin:10px auto;padding:12px}
-  #quizRoot{display:none}
-  .question-box{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 8px 24px rgba(3,10,12,0.06);font-size:1.75rem;line-height:1.2;min-height:110px;margin-bottom:14px;transition:transform .18s ease,opacity .18s ease}
-  .options-box{background:var(--card);padding:12px;border-radius:14px;box-shadow:0 8px 24px rgba(3,10,12,0.06);font-size:1.55rem}
-  .option{display:block;width:100%;padding:16px;margin:10px 0;border-radius:12px;border:2px solid var(--accent);background:#eaf8f8;text-align:left;font-size:1.45rem;cursor:pointer;transition:transform .08s ease,background .12s}
-  .option:active{transform:scale(.997)}
-  .option.disabled{pointer-events:none;opacity:.65}
-  .controls{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-  .small-muted{font-size:13px;color:var(--muted)}
-
-  /* ---------- Progress / timer / subtitle / rationale ---------- */
-  .status-row{display:flex;justify-content:space-between;align-items:center;margin:6px 0;gap:8px}
-  .progress-bar{height:8px;background:#e6f2f2;border-radius:999px;overflow:hidden}
-  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#00b2a3);width:0;transition:width .4s ease}
-  #timerBox,#progressBox,#subtitleBox{font-size:16px;padding:6px 0}
-  #rationaleBox{margin-top:14px;padding:12px;background:#fff;border-left:4px solid var(--accent);border-radius:8px;font-size:16px}
-
-  /* ---------- Floating Jump / Shuffle / Dark toggle ---------- */
-  .float-actions{position:fixed;right:14px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:9999}
-  .float-btn{width:54px;height:54px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(3,10,12,0.12);cursor:pointer;font-size:20px}
-  .float-btn:hover{background:var(--accent-2)}
-
-  /* ---------- Review modal ---------- */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:10000}
-  .modal .panel{background:var(--card);width:95%;max-width:880px;padding:18px;border-radius:12px;max-height:85vh;overflow:auto}
-
-  /* ---------- Dark mode ---------- */
-  .dark{--bg:#071017;--card:#071821;--text:#e9f6f6;--muted:#93a6a6;--accent:#1aa69a;--accent-2:#138276}
-  .hide{display:none}
-
-  /* ---------- Responsive ---------- */
-  @media(max-width:480px){
-    .question-box{font-size:1.95rem;min-height:150px}
-    .options-box{font-size:1.75rem}
-    .option{font-size:1.7rem;padding:18px}
-    .float-actions{right:10px;bottom:12px}
-  }
-</style>
-</head>
-<body>
-
-<!-- Landing (original preserved) -->
-<div class="landing">
-  <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
-  <h1>Nursing Prometric Simulation Test</h1>
-  <p class="small">Try the demo first or continue to the full 500-item test to master your skills!</p>
-  <a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
-  <button class="button" id="continueFullTestButton">🔑 Continue Full Test</button>
-  <div style="margin-top:10px" class="small-muted">Original layout preserved — upgrades applied without replacing features.</div>
-</div>
-
-<!-- Dashboard area -->
-<div id="login-dashboard" class="card hide"></div>
-
-<!-- Quiz area -->
-<div class="quiz-wrap">
-  <div id="quizRoot" class="hide">
-    <div class="status-row">
-      <div id="timerBox">⏳ 0s</div>
-      <div id="progressBox">0 / 0</div>
-      <div id="subtitleBox"></div>
-    </div>
-
-    <div id="questionAnim">
-      <div id="questionBox" class="question-box">Loading...</div>
-    </div>
-
-    <div id="optionsAnim">
-      <div id="optionsBox" class="options-box"></div>
-    </div>
-
-    <div class="controls">
-      <button class="button" id="prevBtn" onclick="prevQ()" style="display:none">⬅ Previous</button>
-      <button class="button" id="nextBtn" onclick="nextQ()" style="display:none">Next ➡</button>
-      <button class="button" id="reviewBtn" onclick="openReview()" style="display:none">Review Mode</button>
-    </div>
-
-    <div style="margin-top:10px">
-      <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-    </div>
-
-    <div id="rationaleBox" class="hide"></div>
-  </div>
-</div>
-
-<!-- Floating actions -->
-<div class="float-actions" aria-hidden="false">
-  <div class="float-btn" id="shuffleBtn" title="Shuffle" onclick="toggleShuffle()">🔀</div>
-<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Nursing Prometric Test — Protected (Android)</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-  /* Strong protections + original styling preserved */
-  :root{--accent:#007b83;--accent-2:#005f63;--bg:#eef5f5;--card:#fff;--text:#062021;--muted:#6b6b6b;}
-  *{box-sizing:border-box; -webkit-user-select:none; -ms-user-select:none; user-select:none; -webkit-touch-callout:none;}
-  html,body{height:100%; margin:0; padding:0; background:var(--bg); color:var(--text); font-family:'Inter',Arial, sans-serif; -webkit-font-smoothing:antialiased}
+  body{font-family:'Inter', Arial, sans-serif; margin:0; padding:0; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent}
   a.button, button.button{display:inline-block;padding:12px 20px;margin:8px;background:var(--accent);color:#fff;border:none;border-radius:10px;cursor:pointer;text-decoration:none;font-size:16px}
   a.button:hover, button.button:hover{background:var(--accent-2)}
   .landing{padding:16px;text-align:center}
@@ -147,37 +33,60 @@
   .option:active{transform:scale(.997)}
   .option.disabled{pointer-events:none;opacity:.7}
   .controls{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+
+  /* progress bar */
   .progress-bar{height:8px;background:#e6f2f2;border-radius:999px;overflow:hidden;margin-top:8px}
   .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#00b2a3);width:0;transition:width .45s ease}
+
+  /* subtitle & rationale */
   #subtitleBox{font-weight:600;color:var(--accent-2);margin-top:8px}
   #rationaleBox{margin-top:14px;padding:12px;background:#fff;border-left:4px solid var(--accent);border-radius:8px;font-size:16px}
+
+  /* floating actions */
   .float-actions{position:fixed;right:14px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:9999}
   .float-btn{width:54px;height:54px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(3,10,12,0.12);cursor:pointer;font-size:20px}
+  .float-btn:hover{background:var(--accent-2)}
+
+  /* modal */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:10000}
   .modal .panel{background:var(--card);width:95%;max-width:880px;padding:18px;border-radius:12px;max-height:85vh;overflow:auto}
-  .review-row{padding:10px;border-bottom:1px solid #f1f1f1}
+
+  /* review list */
+  .review-row {padding:10px;border-bottom:1px solid #f1f1f1}
+
+  /* dark */
   .dark{--bg:#071017;--card:#071821;--text:#e9f6f6;--muted:#93a6a6;--accent:#1aa69a;--accent-2:#138276}
   .hide{display:none}
-  .fade-in{animation:fadeIn .28s ease both}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  @media(max-width:480px){.question-box{font-size:2.1rem;min-height:150px}.options-box{font-size:1.9rem}.option{font-size:1.9rem;padding:18px}.float-actions{right:10px;bottom:12px}}
-  /* extra: make UI harder to read in source (style-level) */ 
+
+  /* animations */
+  .fade-in { animation: fadeIn .28s ease both; }
+  @keyframes fadeIn { from {opacity:0; transform:translateY(6px)} to {opacity:1; transform:translateY(0)} }
+
+  /* responsive */
+  @media(max-width:480px){
+    .question-box{font-size:2.1rem;min-height:150px}
+    .options-box{font-size:1.9rem}
+    .option{font-size:1.9rem;padding:18px}
+    .float-actions{right:10px;bottom:12px}
+  }
 </style>
 </head>
 <body>
 
-<!-- Landing preserved -->
+<!-- Landing (original preserved) -->
 <div class="landing" id="landingArea">
   <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
   <h1>Nursing Prometric Simulation Test</h1>
   <p class="small">Try the demo first or continue to the full 500-item test to master your skills!</p>
   <a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
   <button class="button" id="continueFullTestButton">🔑 Continue Full Test</button>
-  <div style="margin-top:10px" class="small-muted">Original layout preserved — strong protections enabled.</div>
+  <div style="margin-top:10px" class="small-muted">Original layout preserved — upgrades applied without replacing features.</div>
 </div>
 
+<!-- Dashboard area (login/register/payment/unlock) -->
 <div id="login-dashboard" class="card hide"></div>
 
+<!-- Quiz area -->
 <div class="quiz-wrap">
   <div id="quizRoot" class="hide">
     <div class="status-row">
@@ -185,28 +94,34 @@
       <div id="progressBox">0 / 0</div>
       <div id="subtitleBox"></div>
     </div>
+
     <div id="questionAnim" class="fade-in">
       <div id="questionBox" class="question-box">Loading...</div>
     </div>
+
     <div id="optionsAnim" class="fade-in">
       <div id="optionsBox" class="options-box"></div>
     </div>
+
     <div class="controls">
       <button class="button" id="prevBtn" onclick="prevQ()" style="display:none">⬅ Previous</button>
       <button class="button" id="nextBtn" onclick="nextQ()" style="display:none">Next ➡</button>
       <button class="button" id="reviewBtn" onclick="openReview()" style="display:none">Review Mode</button>
     </div>
+
     <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
     <div id="rationaleBox" class="hide"></div>
   </div>
 </div>
 
+<!-- Floating actions -->
 <div class="float-actions" aria-hidden="false">
   <div class="float-btn" id="shuffleBtn" title="Shuffle" onclick="toggleShuffle()">🔀</div>
   <div class="float-btn" id="jumpBtn" title="Jump" onclick="openJump()">↗</div>
   <div class="float-btn" id="darkBtn" title="Dark Mode" onclick="toggleDark()">🌙</div>
 </div>
 
+<!-- Review modal -->
 <div id="reviewModal" class="modal" onclick="closeReview(event)">
   <div class="panel" onclick="event.stopPropagation()">
     <h3>Review Questions</h3>
@@ -215,6 +130,7 @@
   </div>
 </div>
 
+<!-- Jump modal -->
 <div id="jumpModal" class="modal" onclick="closeJump(event)">
   <div class="panel" onclick="event.stopPropagation()">
     <h3>Jump to Question</h3>
@@ -223,29 +139,407 @@
   </div>
 </div>
 
-<!-- Audio (kept) -->
+<!-- Audio -->
 <audio id="sndCorrect" src="https://www.soundjay.com/button/sounds/button-4.mp3" preload="auto"></audio>
 <audio id="sndWrong" src="https://www.soundjay.com/button/sounds/button-10.mp3" preload="auto"></audio>
 <audio id="sndNext" src="https://www.soundjay.com/button/sounds/button-30.mp3" preload="auto"></audio>
 <audio id="sndFinish" src="https://www.soundjay.com/human/sounds/applause-3.mp3" preload="auto"></audio>
 
-<!-- Obfuscated application script (Base64 payload) -->
 <script>
-/* Strong protection: app JS is embedded as Base64 and executed at runtime.
-   This makes the code extremely hard to read or copy by most users. */
+/* ========= CONFIG (unchanged) ========= */
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyAahjib1U3F-L1HrRDItXBKImZXZNORT7z7hyKz373wq5Xg-xGParOZlO8J4B7hjXT/exec';
+const FULL_TEST_URL = 'https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/';
 
-(function(){
+/* ========= STATE ========= */
+let questions = [];
+let originalQuestions = [];
+let currentIndex = 0;
+let user = null;
+let shuffleMode = false;
+let answered = {}; // { idx: {selected, correct, time} }
+let allowBack = true;
+let timer = 0, timerInterval = null;
+
+/* ========= UI helpers ========= */
+const el = id => document.getElementById(id);
+const play = id => { try{ el(id).currentTime = 0; el(id).play(); }catch(e){} };
+
+/* ========= Anti-cheat & protections ========= */
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('cut', e => e.preventDefault());
+document.addEventListener('paste', e => e.preventDefault());
+window.addEventListener('beforeunload', e => { e.preventDefault(); e.returnValue = ''; }); // warn before leaving
+// detect visibility change and log locally
+document.addEventListener('visibilitychange', () => {
+  const events = JSON.parse(localStorage.getItem('npt_events')||'[]');
+  events.push({type:'visibility', state: document.visibilityState, time:Date.now()});
+  localStorage.setItem('npt_events', JSON.stringify(events));
+});
+
+/* block rapid taps across whole document (anti double-submit) */
+let lastTap = 0;
+document.addEventListener('click', (ev) => {
+  const now = Date.now();
+  if (now - lastTap < 140) ev.stopImmediatePropagation();
+  lastTap = now;
+}, true);
+
+/* ========= Init: keep original 'Continue' button behavior ========= */
+el('continueFullTestButton').addEventListener('click', renderLoginForm);
+
+/* ========= Login / Register (original fields preserved) ========= */
+function renderLoginForm(){
+  const box = el('login-dashboard');
+  box.classList.remove('hide');
+  box.innerHTML = `
+    <div class="card">
+      <h3>Login / Register</h3>
+      <input type="text" id="name" placeholder="Full Name"><br>
+      <input type="password" id="password" placeholder="Password"><br>
+      <input type="text" id="telegram" placeholder="Your Telegram Username or Chat ID"><br>
+      <div style="text-align:right;margin-top:8px"><button class="button" onclick="registerUser()">Register & Continue</button></div>
+    </div>
+  `;
+}
+
+function registerUser(){
+  const name = el('name').value.trim();
+  const pw = el('password').value.trim();
+  const tg = el('telegram').value.trim();
+  if(!name || !pw || !tg){ alert('Please fill all fields'); return; }
+  user = { name, password: pw, telegram: tg, userId: 'u_' + Date.now() };
+  localStorage.setItem('npt_user', JSON.stringify(user));
+  renderDashboard();
+}
+
+function renderDashboard(){
+  const name = (user && user.name) || (localStorage.getItem('npt_user') ? JSON.parse(localStorage.getItem('npt_user')).name : '');
+  el('login-dashboard').innerHTML = `
+    <div class="card">
+      <h3>Welcome, ${name}</h3>
+      <p class="small-muted">Choose an option:</p>
+      <div style="text-align:center">
+        <button class="button" onclick="startPaymentFlow()">1. Continue Test</button>
+        <button class="button" onclick="resetToLanding()">2. Back to Landing</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ========= Payment Flow (original) ========= */
+function startPaymentFlow(){
+  el('login-dashboard').innerHTML = `
+    <div class="card">
+      <p>Step 1: Send IDR 50k to OVO: <strong>+6281901685253</strong></p>
+      <div style="text-align:center"><button class="button" onclick="paymentDone()">Payment Done</button></div>
+    </div>
+  `;
+}
+
+async function paymentDone(){
+  user = user || JSON.parse(localStorage.getItem('npt_user'));
+  if(!user){ alert('Please register first'); renderLoginForm(); return; }
+  const payload = { action:'paymentClaim', name:user.name, telegram:user.telegram, userId:user.userId };
   try{
-    var payload = "PASTE_BASE64_PAYLOAD_HERE";
-    // decode and execute
-    var decoded = atob(payload);
-    (1,eval)(decoded);
-  }catch(e){
-    console.error('App init failed', e);
-    document.getElementById('questionBox') && (document.getElementById('questionBox').innerText = 'Initialization error.');
-  }
-})();
-</script>
+    const res = await fetch(BACKEND_URL, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+    const j = await res.json();
+    if(j.ok){
+      alert('Payment claim sent to admin. Admin will verify and generate the unlock code.');
+      el('login-dashboard').innerHTML = `
+        <div class="card">
+          <p>Step 2: Waiting for admin verification...</p>
+          <p>Enter the unlock code given by admin:</p>
+          <input id="unlockInput" placeholder="Enter Special Code"><br>
+          <div style="text-align:right;margin-top:8px"><button class="button" onclick="submitUnlock()">Unlock Test</button></div>
+        </div>`;
+    } else {
+      alert('Failed to send claim: ' + (j.error || 'unknown'));
+    }
+  }catch(e){ console.error(e); alert('Network error while contacting backend'); }
+}
 
+async function submitUnlock(){
+  const code = el('unlockInput').value.trim();
+  if(!code){ alert('Please enter code'); return; }
+  user = user || JSON.parse(localStorage.getItem('npt_user'));
+  const payload = { action:'verifyCode', userId:user.userId, code: code };
+  try{
+    const res = await fetch(BACKEND_URL, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+    const j = await res.json();
+    if(j.ok){
+      play('sndFinish');
+      alert('✅ Code verified! Starting your full test now...');
+      startQuizInPlace();
+    } else {
+      play('sndWrong');
+      alert('Invalid code. Please verify with admin.');
+    }
+  }catch(e){ console.error(e); alert('Network error while verifying code'); }
+}
+
+/* ========= Start quiz in-place (fullscreen + auto-resume) ========= */
+function startQuizInPlace(){
+  // hide landing & login
+  document.getElementById('landingArea').style.display = 'none';
+  el('login-dashboard').classList.add('hide');
+
+  // show quiz
+  el('quizRoot').classList.remove('hide');
+  el('rationaleBox').classList.add('hide');
+  el('reviewBtn').style.display = 'inline-block';
+
+  // request fullscreen (user gesture required, might be blocked on iOS)
+  try {
+    const elFS = document.documentElement;
+    if (elFS.requestFullscreen) elFS.requestFullscreen().catch(()=>{});
+    else if (elFS.webkitRequestFullscreen) elFS.webkitRequestFullscreen().catch(()=>{});
+  } catch (e) {}
+
+  // load questions (getQuestions=1) and auto-resume
+  fetchQuestions().then(()=>{ startTimer(); restoreProgress(); }).catch(err => { el('questionBox').innerText = 'Failed to load questions.'; console.error(err); });
+}
+
+/* ========= Fetch questions ========= */
+async function fetchQuestions(){
+  el('questionBox').innerText = 'Loading questions...';
+  const res = await fetch(BACKEND_URL + '?getQuestions=1');
+  if(!res.ok) throw new Error('Network response not ok');
+  const data = await res.json();
+  if(!Array.isArray(data) || data.length === 0) throw new Error('No questions');
+  originalQuestions = JSON.parse(JSON.stringify(data));
+  questions = data.slice();
+  // ensure numbering continuous
+  questions.forEach((q,i)=> q.no = i+1);
+  currentIndex = 0;
+  answered = {};
+  saveProgress(); // initialize storage
+  renderQuestion();
+  updateProgressBar();
+}
+
+/* ========= Timer ========= */
+function startTimer(){ timer = Number(localStorage.getItem('npt_timer')||0); el('timerBox').innerText = '⏳ ' + timer + 's'; if(timerInterval) clearInterval(timerInterval); timerInterval = setInterval(()=>{ timer++; el('timerBox').innerText = '⏳ ' + timer + 's'; localStorage.setItem('npt_timer', timer); }, 1000); }
+function stopTimer(){ if(timerInterval) clearInterval(timerInterval); }
+
+/* ========= Render question ========= */
+function renderQuestion(){
+  if(!questions || questions.length===0){ el('questionBox').innerText = 'No questions available.'; return; }
+  const q = questions[currentIndex];
+
+  el('questionBox').classList.remove('fade-in');
+  el('optionsBox').classList.remove('fade-in');
+  void el('questionBox').offsetWidth; // trigger reflow
+  void el('optionsBox').offsetWidth;
+  el('questionBox').classList.add('fade-in');
+  el('optionsBox').classList.add('fade-in');
+
+  el('questionBox').innerHTML = `<strong>${q.no}. ${escapeHtml(q.question)}</strong>`;
+  el('subtitleBox').innerText = q.subtitle || '';
+
+  const box = el('optionsBox');
+  box.innerHTML = '';
+  (q.options || []).forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'option';
+    b.innerText = opt;
+    b.onclick = () => handleAnswer(i, q.correct, q.rationale);
+    // prevent double-tap
+    b.addEventListener('click', ()=>{ b.classList.add('disabled'); setTimeout(()=>b.classList.remove('disabled'), 800); });
+    box.appendChild(b);
+  });
+
+  el('prevBtn').style.display = (allowBack && currentIndex>0) ? 'inline-block' : 'none';
+  el('nextBtn').style.display = 'none';
+  el('progressBox').innerText = `${currentIndex + 1} / ${questions.length}`;
+  updateProgressBar();
+  saveProgress();
+}
+
+/* ========= Handle answer selection ========= */
+function handleAnswer(selectedIndex, correctIndex, rationale){
+  // block quick successive answers
+  if(el('optionsBox').querySelector('.option.disabled')) return;
+
+  // save answer
+  answered[currentIndex] = { selected: selectedIndex, correct: correctIndex, time: Date.now(), rationale: rationale || '' };
+  saveProgress();
+
+  // feedback
+  if(selectedIndex === correctIndex){ play('sndCorrect'); }
+  else { play('sndWrong'); }
+
+  // show rationale
+  el('rationaleBox').innerText = answered[currentIndex].rationale || '—';
+  el('rationaleBox').classList.remove('hide');
+
+  // show next button
+  el('nextBtn').style.display = 'inline-block';
+  play('sndNext');
+
+  // auto-advance after short delay
+  setTimeout(()=> {
+    if(currentIndex < questions.length -1){ currentIndex++; renderQuestion(); }
+    else { finishTest(); }
+  }, 600);
+}
+
+/* ========= Navigation ========= */
+function nextQ(){ if(currentIndex < questions.length -1){ currentIndex++; renderQuestion(); } else finishTest(); }
+function prevQ(){ if(allowBack && currentIndex > 0){ currentIndex--; renderQuestion(); } }
+
+/* ========= Finish test ========= */
+function finishTest(){
+  stopTimer();
+  el('questionBox').innerHTML = `<strong>✅ Test Completed</strong><div class="small-muted">Time: ${timer}s</div>`;
+  el('optionsBox').innerHTML = `<div class="small-muted">You finished the test. Use Review Mode to see your answers.</div>`;
+  el('nextBtn').style.display = 'none';
+  el('prevBtn').style.display = 'none';
+  el('progressBox').innerText = `Completed`;
+  el('progressFill').style.width = '100%';
+  play('sndFinish');
+  setTimeout(()=>openReview(), 900);
+}
+
+/* ========= Progress bar ========= */
+function updateProgressBar(){
+  const pct = ((currentIndex+1) / Math.max(1, questions.length)) * 100;
+  el('progressFill').style.width = pct + '%';
+}
+
+/* ========= Shuffle ========= */
+function toggleShuffle(){
+  shuffleMode = !shuffleMode;
+  if(shuffleMode){
+    questions = originalQuestions.slice();
+    for(let i = questions.length -1; i>0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [questions[i], questions[j]] = [questions[j], questions[i]];
+    }
+    questions.forEach((q, idx)=> q.no = idx + 1);
+    currentIndex = 0;
+    alert('Shuffle ON');
+  } else {
+    questions = originalQuestions.slice();
+    questions.forEach((q, idx)=> q.no = idx + 1);
+    currentIndex = 0;
+    alert('Shuffle OFF');
+  }
+  saveProgress();
+  renderQuestion();
+}
+
+/* ========= Jump to question UI ========= */
+function openJump(){
+  el('jumpModal').style.display = 'flex';
+  const container = el('jumpContent'); container.innerHTML = '';
+  questions.forEach((q, idx)=>{
+    const node = document.createElement('div');
+    node.style.padding='8px';
+    node.style.borderBottom='1px solid #eee';
+    node.innerHTML = `<button class="button" style="padding:6px 10px;margin-right:8px" onclick="jumpTo(${idx})">${q.no}</button> ${escapeHtml(q.question).slice(0,80)}...`;
+    container.appendChild(node);
+  });
+}
+function closeJump(e){ if(!e) el('jumpModal').style.display='none'; else if(e.target.classList.contains('modal')) el('jumpModal').style.display='none'; }
+function jumpTo(idx){ currentIndex = idx; el('jumpModal').style.display='none'; renderQuestion(); }
+
+/* ========= Review Mode ========= */
+function openReview(){
+  el('reviewModal').style.display = 'flex';
+  const cont = el('reviewContent'); cont.innerHTML = '';
+  originalQuestions.forEach((q, idx)=>{
+    const r = answered[idx];
+    const sel = r ? r.selected : null;
+    const correct = q.correct;
+    const row = document.createElement('div');
+    row.className = 'review-row';
+    row.innerHTML = `<strong>${q.no}. ${escapeHtml(q.question)}</strong>
+      <div style="margin-top:6px">Your answer: <em>${sel===null? 'Not answered' : escapeHtml(q.options[sel]||'')}</em></div>
+      <div>Correct answer: <em>${escapeHtml(q.options[correct]||'')}</em></div>
+      <div style="margin-top:6px;color:#666">${escapeHtml(q.rationale || '')}</div>`;
+    cont.appendChild(row);
+  });
+}
+function closeReview(e){ if(!e) el('reviewModal').style.display='none'; else if(e.target.classList.contains('modal')) el('reviewModal').style.display='none'; }
+
+/* ========= Save/Restore progress (auto-resume) ========= */
+function saveProgress(){
+  try {
+    const save = {
+      currentIndex,
+      answered,
+      timer,
+      shuffleMode,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('npt_progress', JSON.stringify(save));
+  } catch (e) {}
+}
+
+function restoreProgress(){
+  try {
+    const raw = localStorage.getItem('npt_progress');
+    if(!raw) return;
+    const save = JSON.parse(raw);
+    if(save && typeof save.currentIndex === 'number'){
+      currentIndex = save.currentIndex;
+      answered = save.answered || {};
+      timer = save.timer || 0;
+      shuffleMode = !!save.shuffleMode;
+      // if shuffleMode was on, reapply shuffle (best-effort)
+      if(shuffleMode){
+        questions = originalQuestions.slice();
+        for(let i = questions.length -1; i>0; i--){
+          const j = Math.floor(Math.random() * (i+1));
+          [questions[i], questions[j]] = [questions[j], questions[i]];
+        }
+        questions.forEach((q,i)=> q.no = i+1);
+      }
+      renderQuestion();
+    }
+  } catch(e){ console.error('restore failed', e); }
+}
+
+/* ========= Utility ========= */
+function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'})[m]; }); }
+
+/* ========= Dark Mode ========= */
+let dark = false;
+function toggleDark(){ dark = !dark; if(dark) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); }
+
+/* ========= Disable download / save UI ========= */
+// nothing visible exposes a download link; block common save keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P')) { e.preventDefault(); alert('Saving is disabled'); }
+});
+
+/* ========= Persist session on load ========= */
+window.addEventListener('load', ()=> {
+  try {
+    const st = localStorage.getItem('npt_user');
+    if(st){ user = JSON.parse(st); renderDashboard(); }
+    // try auto-restore only if quiz was in progress
+    const raw = localStorage.getItem('npt_progress');
+    if(raw && confirm('Resume previous session?')) {
+      // show quiz UI and restore
+      document.getElementById('landingArea').style.display = 'none';
+      el('login-dashboard').classList.add('hide');
+      el('quizRoot').classList.remove('hide');
+      fetchQuestions().then(()=>{ restoreProgress(); startTimer(); }).catch(()=>{});
+    }
+  } catch(e){}
+});
+
+/* ========= Accessibility / shortcuts ========= */
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight') nextQ();
+  if(e.key === 'ArrowLeft') prevQ();
+});
+
+/* ========= Admin helpers (no exposure here) ========= */
+// nothing added — your admin process remains the same
+
+</script>
 </body>
 </html>
