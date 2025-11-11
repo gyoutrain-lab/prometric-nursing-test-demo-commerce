@@ -70,19 +70,9 @@ input {
 
 <script>
 /* ✅ CONFIGURE YOUR REAL BACKEND DEPLOYMENT URL HERE */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxeD6wYgxkUIwwEuc2YqvM41dCPX3xxZcOG9MpI-8CAGDJdQZimkfwmgFzElKlhzJch/exec/";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwdlfesr6VkdJFVQwrLXzn_4o7OjRmirnc4Zg2ftvqOLJ463G_-z0_wBa1__OK6Vtc/exec";
 
-/* ✅ SAFELY CHECK BACKEND STATUS ON LOAD */
-window.addEventListener("load", async () => {
-  try {
-    const test = await fetch(BACKEND_URL + "?ping=true", { method: "GET" });
-    if (test.ok) console.log("✅ Backend online");
-    else console.warn("⚠️ Backend returned error:", test.status);
-  } catch (err) {
-    console.error("❌ Backend not reachable:", err);
-  }
-});
-
+/* --- CONTINUE BUTTON ACTION --- */
 document.getElementById("continueFullTestButton").addEventListener("click", () => renderLoginForm());
 
 /* --- RENDER LOGIN FORM --- */
@@ -183,19 +173,18 @@ function cancelTest() {
   document.getElementById("login-dashboard").innerHTML = "<p>Back to Landing</p>";
 }
 
-/* --- UNIVERSAL FETCH HANDLER --- */
+/* --- UNIVERSAL FETCH HANDLER (SYNC FIXED) --- */
 async function sendToBackend(action, payload = {}) {
   try {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      mode: "cors",
       body: JSON.stringify({ action, ...payload }),
     });
 
-    if (!response.ok) throw new Error("HTTP " + response.status);
-
-    const data = await response.json();
+    // Parse safely (Apps Script returns JSON inside HTML)
+    const text = await response.text();
+    const data = JSON.parse(text);
     console.log("✅ Backend response:", data);
     return data;
   } catch (error) {
