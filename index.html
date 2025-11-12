@@ -33,7 +33,15 @@ img.landing-image {
 <img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
 <div class="header">🩺 Nursing Prometric Simulation Test</div>
 
-<div class="container" id="landing">
+<!-- Connection check -->
+<div class="container" id="checkBox">
+  <h3>Checking Backend Connection...</h3>
+  <p class="small">Please wait while we connect to the server.</p>
+  <div id="checkMsg" class="small"></div>
+</div>
+
+<!-- Landing -->
+<div class="container hidden" id="landing">
   <p>Try the demo first or continue to the full 500-item test to master your skills!</p>
   <a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
   <button class="button" id="continueBtn">🔑 Continue Full Test</button>
@@ -50,7 +58,7 @@ img.landing-image {
   <div id="regMsg" class="small"></div>
 </div>
 
-<!-- Dashboard after register -->
+<!-- Dashboard -->
 <div class="container hidden" id="dashboardBox">
   <h3 id="welcomeName">Welcome</h3>
   <p>Choose an option:</p>
@@ -65,7 +73,7 @@ img.landing-image {
   <button class="button" id="paymentDoneBtn">Payment Done</button>
 </div>
 
-<!-- Waiting for admin & unlock -->
+<!-- Unlock -->
 <div class="container hidden" id="unlockBox">
   <h3>Step 2: Waiting for admin verification...</h3>
   <p class="small">Enter Special Code below when admin provides it via Telegram.</p>
@@ -75,28 +83,47 @@ img.landing-image {
 </div>
 
 <script>
-// ===== CONFIG =====
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzEHtZTaDeezoZaM7cNE2axWFH0C0TLAC2Wd9eyeQy10_gsXPgeOhXVaUwXYLf_0JZk/exec";
+// ✅ CONFIG: set your backend exec URL here
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwhI-82pMmOjJs8AAAefHLjSj2XJm2hXIgEzn7hr7tX_H3ui81tV0Gl7YhQ_wPrWVE5/exec";
 
-// ===== UI ELEMENTS =====
+// Elements
+const checkBox = document.getElementById('checkBox');
+const checkMsg = document.getElementById('checkMsg');
 const landing = document.getElementById('landing');
 const registerBox = document.getElementById('registerBox');
 const dashboardBox = document.getElementById('dashboardBox');
 const paymentBox = document.getElementById('paymentBox');
 const unlockBox = document.getElementById('unlockBox');
-
 const continueBtn = document.getElementById('continueBtn');
 const registerBtn = document.getElementById('registerBtn');
 const continueTestBtn = document.getElementById('continueTestBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 const paymentDoneBtn = document.getElementById('paymentDoneBtn');
 const submitUnlockBtn = document.getElementById('submitUnlockBtn');
-
 const regMsg = document.getElementById('regMsg');
 const unlockMsg = document.getElementById('unlockMsg');
 const welcomeName = document.getElementById('welcomeName');
 
-// ===== EVENTS =====
+// ✅ AUTO CHECK BACKEND FIRST
+(async ()=>{
+  checkMsg.textContent = "Connecting to backend...";
+  try {
+    const res = await fetch(BACKEND_URL + "?action=test");
+    const j = await res.json();
+    if (j.ok) {
+      checkMsg.textContent = "✅ Backend connected successfully!";
+      setTimeout(()=>{ 
+        checkBox.classList.add('hidden');
+        landing.classList.remove('hidden');
+      }, 600);
+    } else {
+      checkMsg.innerHTML = "⚠️ Backend responded but not OK. Please recheck Apps Script code.";
+    }
+  } catch (err) {
+    checkMsg.innerHTML = "❌ Network error.<br><small>"+err.message+"</small><br>Please redeploy your backend as <b>Anyone</b>.";
+  }
+})();
+
 continueBtn.addEventListener('click', () => {
   landing.classList.add('hidden');
   registerBox.classList.remove('hidden');
@@ -106,16 +133,11 @@ registerBtn.addEventListener('click', async () => {
   const name = document.getElementById('name').value.trim();
   const password = document.getElementById('password').value.trim();
   const telegram = document.getElementById('telegram').value.trim();
-  if (!name || !password || !telegram) {
-    regMsg.textContent = "Please fill all fields";
-    regMsg.className='error';
-    return;
-  }
+  if (!name || !password || !telegram) { regMsg.textContent = "Please fill all fields"; regMsg.className='error'; return; }
 
   const userId = "u_" + Date.now();
   localStorage.setItem('nursing_user', JSON.stringify({ name, password, telegram, userId }));
   regMsg.textContent = "Registering...";
-
   try {
     const res = await fetch(BACKEND_URL, {
       method: 'POST',
@@ -126,14 +148,13 @@ registerBtn.addEventListener('click', async () => {
     if (j.ok) {
       regMsg.textContent = j.message || "Registered";
       regMsg.className='success';
-      setTimeout(showDashboard, 800);
+      setTimeout(()=>{ showDashboard(); }, 600);
     } else {
       regMsg.textContent = j.message || "Registration failed";
       regMsg.className='error';
     }
   } catch (e) {
-    regMsg.textContent = "Network error: please check internet or backend URL.";
-    regMsg.className='error';
+    regMsg.textContent = "Network error: " + e.message; regMsg.className='error';
   }
 });
 
@@ -157,7 +178,6 @@ cancelBtn.addEventListener('click', () => {
 paymentDoneBtn.addEventListener('click', async () => {
   const u = JSON.parse(localStorage.getItem('nursing_user')||'{}');
   if (!u || !u.userId) { alert("User ID missing. Please register again."); return; }
-
   try {
     const res = await fetch(BACKEND_URL, {
       method: 'POST',
@@ -172,7 +192,7 @@ paymentDoneBtn.addEventListener('click', async () => {
       alert(j.message || "Failed to send payment claim");
     }
   } catch (e) {
-    alert("Network error: please check internet or backend URL.");
+    alert("Network error: " + e.message);
   }
 });
 
@@ -182,12 +202,11 @@ submitUnlockBtn.addEventListener('click', async () => {
   if (!u || !u.userId) { unlockMsg.textContent = "Missing user. Re-register."; return; }
   if (!code) { unlockMsg.textContent = "Enter code"; return; }
   unlockMsg.textContent = "Verifying...";
-
   try {
     const res = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "verifyCode", userId: u.userId, code })
+      body: JSON.stringify({ action: "verifyCode", userId: u.userId, code: code })
     });
     const j = await res.json();
     if (j.ok) {
@@ -197,7 +216,7 @@ submitUnlockBtn.addEventListener('click', async () => {
       unlockMsg.textContent = j.message || "Invalid code.";
     }
   } catch (e) {
-    unlockMsg.textContent = "Network error: please check internet or backend URL.";
+    unlockMsg.textContent = "Network error: " + e.message;
   }
 });
 </script>
