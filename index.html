@@ -75,11 +75,9 @@ img.landing-image {
 </div>
 
 <script>
-// ===============================
-// CONFIG
-// ===============================
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxpwhC1ty1pCu1riLmYctANHl86F5pinvpL5aRMAdGZpoZa8LXIDKoVWWosVXsZOsY/exec";
-// ===============================
+// -------- CONFIG: set backend URL here (your provided backend) --------
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyq7XgTvBKWzEajHN9-o8rrBsP3JuHtpkvkLO-FJ0ANGpV4sfzK7IyMiJ73QcLJJCiv/exec";
+// ---------------------------------------------------------------------
 
 // UI refs
 const landing = document.getElementById('landing');
@@ -97,123 +95,107 @@ const regMsg = document.getElementById('regMsg');
 const unlockMsg = document.getElementById('unlockMsg');
 const welcomeName = document.getElementById('welcomeName');
 
-// Step 1: Landing → Register
+function show(el){ el.classList.remove('hidden'); }
+function hide(el){ el.classList.add('hidden'); }
+
+// Keep landing visible first
 continueBtn.addEventListener('click', () => {
-  landing.classList.add('hidden');
-  registerBox.classList.remove('hidden');
+  hide(landing);
+  show(registerBox);
 });
 
-// Step 2: Register
+// Helper: call backend with timeout-safe fetch and clear errors
+async function backendPost(payload) {
+  // all backend posts are JSON
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(()=> controller.abort(), 15000); // 15s timeout
+    const res = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    // If we get non-JSON, handle gracefully
+    const text = await res.text();
+    try { return JSON.parse(text); } catch(e){ return { ok:false, message: 'Bad response from backend', raw: text }; }
+  } catch (err) {
+    // Distinguish network vs CORS vs abort
+    if (err.name === 'AbortError') return { ok:false, message: 'Request timed out. Try again.' };
+    return { ok:false, message: 'Network error: please check internet or backend URL.' };
+  }
+}
+
+// Register
 registerBtn.addEventListener('click', async () => {
-  const name = document.getElementById('name').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const telegram = document.getElementById('telegram').value.trim();
+  const name = (document.getElementById('name').value || '').trim();
+  const password = (document.getElementById('password').value || '').trim();
+  const telegram = (document.getElementById('telegram').value || '').trim();
+  regMsg.className = 'small';
   if (!name || !password || !telegram) { regMsg.textContent = "Please fill all fields"; regMsg.className='error'; return; }
 
   const userId = "u_" + Date.now();
   localStorage.setItem('nursing_user', JSON.stringify({ name, password, telegram, userId }));
   regMsg.textContent = "Registering...";
 
-  try {
-    const res = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        action: "register", 
-        name, 
-        telegram, 
-        password, 
-        userId 
-      })
-    });
-
-    const j = await res.json();
-    if (j.ok) {
-      regMsg.textContent = j.message || "✅ Registered successfully.";
-      regMsg.className='success';
-      setTimeout(()=>{ showDashboard(); }, 800);
-    } else {
-      regMsg.textContent = j.message || "Registration failed";
-      regMsg.className='error';
-    }
-  } catch (e) {
-    regMsg.textContent = "Network error: please check your internet or backend URL.";
-    regMsg.className='error';
+  const result = await backendPost({ action: "register", name, telegram, password, userId });
+  if (result && result.ok) {
+    regMsg.textContent = result.message || "✅ Registered successfully.";
+    regMsg.className = 'success';
+    setTimeout(()=> showDashboard(), 700);
+  } else {
+    regMsg.textContent = (result && result.message) ? result.message : "Registration failed.";
+    regMsg.className = 'error';
   }
 });
 
 function showDashboard(){
-  registerBox.classList.add('hidden');
+  hide(registerBox);
   const u = JSON.parse(localStorage.getItem('nursing_user')||'{}');
-  welcomeName.textContent = "Welcome, " + (u.name||'User');
-  dashboardBox.classList.remove('hidden');
+  welcomeName.textContent = "Welcome, " + (u.name || 'User');
+  show(dashboardBox);
 }
 
-// Step 3: Payment
 continueTestBtn.addEventListener('click', () => {
-  dashboardBox.classList.add('hidden');
-  paymentBox.classList.remove('hidden');
+  hide(dashboardBox);
+  show(paymentBox);
 });
 
 cancelBtn.addEventListener('click', () => {
-  dashboardBox.classList.add('hidden');
-  landing.classList.remove('hidden');
+  hide(dashboardBox);
+  show(landing);
 });
 
 paymentDoneBtn.addEventListener('click', async () => {
   const u = JSON.parse(localStorage.getItem('nursing_user')||'{}');
-  if (!u.userId) { alert("Missing User ID, please re-register."); return; }
-  try {
-    const res = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        action: "paymentClaim", 
-        userId: u.userId, 
-        name: u.name, 
-        telegram: u.telegram 
-      })
-    });
-    const j = await res.json();
-    if (j.ok) {
-      alert("✅ Payment claim sent. Please wait for admin verification via Telegram.");
-      paymentBox.classList.add('hidden');
-      unlockBox.classList.remove('hidden');
-    } else {
-      alert(j.message || "Failed to send payment claim");
-    }
-  } catch (e) {
-    alert("Network error: cannot reach backend.");
+  if (!u || !u.userId) { alert("User ID missing. Please register again."); return; }
+  const result = await backendPost({ action: "paymentClaim", userId: u.userId, name: u.name, telegram: u.telegram });
+  if (result && result.ok) {
+    alert("✅ Payment claim sent. Wait for admin to provide unlock code via Telegram.");
+    hide(paymentBox);
+    show(unlockBox);
+  } else {
+    alert((result && result.message) ? result.message : "Failed to send payment claim.");
   }
 });
 
-// Step 4: Unlock
 submitUnlockBtn.addEventListener('click', async () => {
-  const code = document.getElementById('userCode').value.trim();
+  const code = (document.getElementById('userCode').value || '').trim();
   const u = JSON.parse(localStorage.getItem('nursing_user')||'{}');
-  if (!u.userId) { unlockMsg.textContent = "User not found. Please register again."; unlockMsg.className='error'; return; }
+  unlockMsg.className = 'small';
+  if (!u || !u.userId) { unlockMsg.textContent = "User not found. Please register again."; unlockMsg.className='error'; return; }
   if (!code) { unlockMsg.textContent = "Enter unlock code"; unlockMsg.className='error'; return; }
 
   unlockMsg.textContent = "Verifying...";
-  try {
-    const res = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "verifyCode", userId: u.userId, code })
-    });
-    const j = await res.json();
-    if (j.ok) {
-      unlockMsg.textContent = "🎉 Code verified! Redirecting...";
-      unlockMsg.className='success';
-      setTimeout(()=>{ 
-        window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/"; 
-      }, 1200);
-    } else {
-      unlockMsg.textContent = j.message || "Invalid code.";
-      unlockMsg.className='error';
-    }
-  } catch (e) {
-    unlockMsg.textContent = "Network error: cannot contact backend.";
+  const result = await backendPost({ action: "verifyCode", userId: u.userId, code });
+  if (result && result.ok) {
+    unlockMsg.textContent = "🎉 Code verified! Redirecting...";
+    unlockMsg.className = 'success';
+    // redirect to full test (keep your real full test URL)
+    setTimeout(()=> window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/", 1000);
+  } else {
+    unlockMsg.textContent = (result && result.message) ? result.message : "Invalid code.";
     unlockMsg.className='error';
   }
 });
