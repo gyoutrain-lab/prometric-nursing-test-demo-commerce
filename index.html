@@ -65,12 +65,14 @@ input {
 <a class="button" id="continueFullTestButton">🔑 Continue Full Test</a>
 
 <div id="login-dashboard" style="margin-top:50px"></div>
+<div id="statusBox" style="margin-top:10px; color:#007b83; font-weight:bold;"></div>
 <div class="dashboard-background"></div>
 
 <script>
-/* 🔗 Replace this URL after you deploy your Google Apps Script */
+/* ✅ Your backend Google Apps Script endpoint */
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbz1tCSpkOFYoU2VmUnWbctmwd48Yj7bPtGWfOS-esbAKZWkIJJjIMDKkVmCkF3rPRhu/exec";
 
+/* Handle main button click */
 document.getElementById("continueFullTestButton").addEventListener("click", renderLoginForm);
 
 function renderLoginForm() {
@@ -83,30 +85,35 @@ function renderLoginForm() {
   `;
 }
 
+/* ✅ Improved register function (handles new + existing users automatically) */
 async function registerUser() {
   const name = document.getElementById("name").value.trim();
   const password = document.getElementById("password").value.trim();
   const telegram = document.getElementById("telegram").value.trim();
+
   if (!name || !password || !telegram) return alert("Please fill all fields");
 
-  const userId = "u_" + Date.now();
+  const userId = telegram || ("u_" + Date.now());
   localStorage.setItem("user", JSON.stringify({ name, password, telegram, userId }));
 
+  showStatus("⏳ Registering, please wait...");
+
   const response = await sendToBackend("register", { name, telegram, password, userId });
-  if (response && response.ok) renderDashboardOptions();
-  else alert(response?.message || "Registration failed. Try again.");
+  if (!response) return;
+
+  if (response.ok) {
+    if (response.message && response.message.includes("already registered")) {
+      showStatus("✅ User already registered. Proceeding to payment...");
+    } else {
+      showStatus("✅ Registration successful. Proceeding to payment...");
+    }
+    setTimeout(() => continueTest(), 1200);
+  } else {
+    alert(response?.message || "Registration failed. Try again.");
+  }
 }
 
-function renderDashboardOptions() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  document.getElementById("login-dashboard").innerHTML = `
-    <h2>Welcome, ${user.name}</h2>
-    <p>Choose an option:</p>
-    <button class="button" onclick="continueTest()">1. Continue Test</button>
-    <button class="button" onclick="cancelTest()">2. Cancel</button>
-  `;
-}
-
+/* Show payment step */
 function continueTest() {
   document.getElementById("login-dashboard").innerHTML = `
     <p>Step 1: Send IDR 50k to OVO #(+6281901685253)</p>
@@ -114,16 +121,21 @@ function continueTest() {
   `;
 }
 
+/* ✅ Payment + auto-show unlock step */
 async function paymentDone() {
   const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) return alert("User not found, please register again.");
+
+  showStatus("⏳ Sending payment claim to admin...");
+
   const payload = { name: user.name, telegram: user.telegram, userId: user.userId };
   const response = await sendToBackend("paymentClaim", payload);
 
   if (response && response.ok) {
-    alert("Payment claim sent to admin. Admin will generate your unlock code.");
+    showStatus("💳 Payment claim sent to admin. Admin will receive a secure link and generate your unlock code.");
     document.getElementById("login-dashboard").innerHTML = `
       <p>Step 2: Waiting for admin verification...</p>
-      <p>Enter Special Code</p>
+      <p>Admin will generate a secure unlock code and pass it to you.</p>
       <input type="text" id="userCode" placeholder="Enter Special Code"><br><br>
       <button class="button" onclick="submitUnlock()">Unlock Test</button>
     `;
@@ -132,22 +144,33 @@ async function paymentDone() {
   }
 }
 
+/* ✅ Unlock code verification */
 async function submitUnlock() {
   const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) return alert("User not found, please register again.");
+
   const code = document.getElementById("userCode").value.trim();
   if (!code) return alert("Please enter code");
 
+  showStatus("🔐 Verifying unlock code...");
+
   const response = await sendToBackend("verifyCode", { userId: user.userId, code });
   if (response && response.ok) {
-    alert("🎉 Code verified! Redirecting...");
-    window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/";
-  } else alert("Invalid code. Please verify with admin.");
+    showStatus("🎉 Code verified! Redirecting...");
+    setTimeout(() => {
+      window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/";
+    }, 1200);
+  } else {
+    alert("Invalid code. Please verify with admin.");
+  }
 }
 
+/* Cancel to landing */
 function cancelTest() {
   document.getElementById("login-dashboard").innerHTML = "<p>Back to Landing</p>";
 }
 
+/* ✅ Send data to backend (CORS-safe) */
 async function sendToBackend(action, payload = {}) {
   try {
     const response = await fetch(BACKEND_URL, {
@@ -157,13 +180,17 @@ async function sendToBackend(action, payload = {}) {
       body: JSON.stringify({ action, ...payload }),
     });
     const text = await response.text();
-    const data = JSON.parse(text);
-    return data;
+    return JSON.parse(text);
   } catch (error) {
     console.error("❌ Network or backend error:", error);
     alert("Network error while contacting backend. Please check your connection or try again later.");
     return null;
   }
+}
+
+/* Simple status updater */
+function showStatus(msg) {
+  document.getElementById("statusBox").innerHTML = msg;
 }
 </script>
 </body>
