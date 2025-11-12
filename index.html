@@ -3,36 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <title>Nursing Prometric Simulation Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f7fcfc;
-      color: #222;
+      margin: 0;
+      padding: 0;
       text-align: center;
-      padding: 50px 20px;
+      background: #eef5f5;
+    }
+    .landing-image {
+      width: 100%;
+      max-height: 50vh;
+      object-fit: cover;
     }
     h1 {
       color: #007b83;
-      font-size: 24px;
-      margin-bottom: 15px;
+      margin-top: 20px;
     }
     p {
       font-size: 16px;
-      margin-bottom: 30px;
+      margin: 15px 0 30px 0;
     }
-    button {
-      display: block;
-      width: 220px;
-      margin: 10px auto;
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    .button {
+      display: inline-block;
+      padding: 15px 25px;
+      margin: 15px;
       background-color: #007b83;
       color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      min-width: 140px;
     }
-    button:hover {
+    .button:hover {
       background-color: #005f63;
     }
     footer {
@@ -40,26 +46,33 @@
       font-size: 14px;
       color: #444;
     }
+    .dashboard-background {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background-image: url('https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg');
+      background-size: cover;
+      background-position: center;
+      z-index: -1;
+      opacity: 0.3;
+    }
   </style>
 </head>
 <body>
+  <img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
+
   <h1>Welcome to Nursing Prometric Simulation Test</h1>
   <p>Try the demo first or continue to the full 500-item test to master your skills!</p>
 
-  <button onclick="openDemo()">🩺 Open Demo Test</button>
-  <button onclick="openFull()">🔑 Continue Full Test</button>
+  <a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo-commerce/" target="_blank">🩺 Open Demo Test</a>
+  <a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-full-500/" target="_blank">🔑 Continue Full Test</a>
+
+  <div class="dashboard-background"></div>
 
   <footer>
     Prepared by: <b>Giyono Asfarrasyid, ETK Yogyakarta</b>
   </footer>
-
-  <script>
-    function openDemo() {
-      window.location.href = "https://gyoutrain-lab.github.io/prometric-nursing-test-demo-commerce/";
-    }
-    function openFull() {
-      window.location.href = "https://gyoutrain-lab.github.io/prometric-nursing-test-full-500/";
-    }
-  </script>
 </body>
 </html>
