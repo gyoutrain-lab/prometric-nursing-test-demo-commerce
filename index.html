@@ -1,33 +1,129 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-  </head>
-  <body>
-    <h3>Generate Unlock Codes</h3>
-    <p>Select a user:</p>
-    <select id="userSelect"></select><br><br>
-    <button onclick="generateCode()">Generate Code</button>
-    <p id="result"></p>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nursing Prometric Simulation Test</title>
 
-    <script>
-      // Populate user dropdown
-      google.script.run.withSuccessHandler(function(users){
-        const select = document.getElementById('userSelect');
-        users.forEach(u=>{
-          const opt = document.createElement('option');
-          opt.value = u.userId;
-          opt.text = u.name + " (@"+u.telegram+")";
-          select.add(opt);
-        });
-      }).getAllUsers();
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #eef5f5;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
 
-      function generateCode(){
-        const userId = document.getElementById('userSelect').value;
-        google.script.run.withSuccessHandler(function(res){
-          document.getElementById('result').innerText = 'Unlock code: ' + res.code;
-        }).generateUnlockCodeForAdmin(userId);
-      }
-    </script>
-  </body>
+.container {
+  max-width: 400px;
+  background: white;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+img.logo {
+  width: 100%;
+  border-radius: 12px;
+}
+
+input {
+  width: 90%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+button {
+  background: #007b83;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 95%;
+}
+
+button:hover {
+  background: #005f65;
+}
+
+p {
+  font-size: 15px;
+  color: #333;
+}
+
+#message {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #007b83;
+}
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <img src="https://i.ibb.co/zsK4n4k/nursing-test-banner.jpg" alt="Nursing Prometric Test" class="logo">
+    <h2>🩺 Nursing Prometric Simulation Test</h2>
+    <p id="status">Login / Register</p>
+
+    <input type="text" id="name" placeholder="Your Name" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="text" id="contact" placeholder="Telegram Username (e.g. t.me/yourname)" required>
+    <button onclick="registerUser()">Register & Continue</button>
+
+    <p>We will save your User ID locally.<br>Keep it to claim payment and unlock.</p>
+    <div id="message"></div>
+  </div>
+
+<script>
+const backend = "https://script.google.com/macros/s/AKfycbyq7XgTvBKWzEajHN9-o8rrBsP3JuHtpkvkLO-FJ0ANGpV4sfzK7IyMiJ73QcLJJCiv/exec";
+
+async function registerUser() {
+  const name = document.getElementById("name").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const contact = document.getElementById("contact").value.trim();
+  const msg = document.getElementById("message");
+
+  if (!name || !password || !contact) {
+    msg.innerHTML = "⚠️ Please fill all fields.";
+    msg.style.color = "red";
+    return;
+  }
+
+  msg.innerHTML = "⏳ Registering...";
+  msg.style.color = "#007b83";
+
+  try {
+    const res = await fetch(backend, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "register",
+        name: name,
+        password: password,
+        contact: contact
+      }),
+    });
+
+    const data = await res.json();
+    if (data.status === "success") {
+      localStorage.setItem("userId", data.userId);
+      msg.innerHTML = `✅ Registered Successfully!<br>Your User ID: <b>${data.userId}</b>`;
+      msg.style.color = "green";
+    } else {
+      msg.innerHTML = `⚠️ ${data.message || "Registration failed."}`;
+      msg.style.color = "red";
+    }
+  } catch (err) {
+    msg.innerHTML = "❌ Network error: please check your internet or backend URL.";
+    msg.style.color = "red";
+    console.error(err);
+  }
+}
+</script>
+</body>
 </html>
