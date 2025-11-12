@@ -54,92 +54,64 @@ input {
 </style>
 </head>
 <body>
-<img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
+  <div class="container">
+    <img src="https://i.ibb.co/zsK4n4k/nursing-test-banner.jpg" alt="Nursing Prometric Test" class="logo">
+    <h2>🩺 Nursing Prometric Simulation Test</h2>
+    <p id="status">Login / Register</p>
 
-<h1>Welcome to Nursing Prometric Simulation Test</h1>
-<p>Try the demo first or continue to the full 500-item test to master your skills!</p>
+    <input type="text" id="name" placeholder="Your Name" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="text" id="contact" placeholder="Telegram Username (e.g. t.me/yourname)" required>
+    <button onclick="registerUser()">Register & Continue</button>
 
-<a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
-<a class="button" id="continueFullTestButton">🔑 Continue Full Test</a>
-
-<div id="login-dashboard" style="margin-top:50px"></div>
-<div class="dashboard-background"></div>
+    <p>We will save your User ID locally.<br>Keep it to claim payment and unlock.</p>
+    <div id="message"></div>
+  </div>
 
 <script>
-const BACKEND_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_ID/exec';
-
-document.getElementById("continueFullTestButton").addEventListener("click", showRegister);
-
-function showRegister() {
-  document.getElementById("login-dashboard").innerHTML = `
-    <h2>Login / Register</h2>
-    <input type="text" id="name" placeholder="Full Name"><br>
-    <input type="password" id="password" placeholder="Password"><br>
-    <input type="text" id="telegram" placeholder="Your Telegram Username or Chat ID"><br>
-    <button class="button" onclick="registerUser()">Register & Continue</button>
-  `;
-}
+const backend = "https://script.google.com/macros/s/AKfycbyq7XgTvBKWzEajHN9-o8rrBsP3JuHtpkvkLO-FJ0ANGpV4sfzK7IyMiJ73QcLJJCiv/exec";
 
 async function registerUser() {
   const name = document.getElementById("name").value.trim();
   const password = document.getElementById("password").value.trim();
-  const telegram = document.getElementById("telegram").value.trim();
-  if (!name || !password || !telegram) return alert("Please fill all fields");
+  const contact = document.getElementById("contact").value.trim();
+  const msg = document.getElementById("message");
 
-  const payload = { action: 'register', name, telegram, password };
+  if (!name || !password || !contact) {
+    msg.innerHTML = "⚠️ Please fill all fields.";
+    msg.style.color = "red";
+    return;
+  }
+
+  msg.innerHTML = "⏳ Registering...";
+  msg.style.color = "#007b83";
+
   try {
-    const res = await fetch(BACKEND_URL, {
+    const res = await fetch(backend, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        action: "register",
+        name: name,
+        password: password,
+        contact: contact
+      }),
     });
+
     const data = await res.json();
-    if (data.ok) {
-      alert(data.message);
+    if (data.status === "success") {
       localStorage.setItem("userId", data.userId);
-      renderPayment();
-    } else alert(data.message);
-  } catch(e) {
-    alert("Network error: " + e.message);
+      msg.innerHTML = `✅ Registered Successfully!<br>Your User ID: <b>${data.userId}</b>`;
+      msg.style.color = "green";
+    } else {
+      msg.innerHTML = `⚠️ ${data.message || "Registration failed."}`;
+      msg.style.color = "red";
+    }
+  } catch (err) {
+    msg.innerHTML = "❌ Network error: please check your internet or backend URL.";
+    msg.style.color = "red";
+    console.error(err);
   }
-}
-
-function renderPayment() {
-  document.getElementById("login-dashboard").innerHTML = `
-    <h3>Step 1: Send IDR 50k to OVO #(+6281901685253)</h3>
-    <button class="button" onclick="claimPayment()">✅ Payment Done</button>
-  `;
-}
-
-async function claimPayment() {
-  const userId = localStorage.getItem("userId");
-  if (!userId) return alert("User not found");
-
-  try {
-    const res = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: 'claimPayment', userId })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      alert(data.message);
-      document.getElementById("login-dashboard").innerHTML = `
-        <h3>Step 2: Waiting for admin verification...</h3>
-        <input type="text" id="specialCode" placeholder="Enter Special Code"><br>
-        <button class="button" onclick="unlockTest()">Unlock Test</button>
-      `;
-    } else alert(data.message);
-  } catch(e) {
-    alert("Network error: " + e.message);
-  }
-}
-
-function unlockTest() {
-  const code = document.getElementById("specialCode").value.trim();
-  if (!code) return alert("Please enter unlock code");
-  alert("🎉 Code verified! Redirecting to test...");
-  window.location.href = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/";
 }
 </script>
 </body>
