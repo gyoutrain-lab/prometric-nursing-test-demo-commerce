@@ -143,9 +143,7 @@ a.button:hover {
 <div class="container hidden" id="pageRegister">
   <h3>Step 1: Registration</h3>
   <input type="text" id="name" placeholder="Full Name">
-  <input type="text" id="telegram" placeholder="Telegram Username (e.g. @yourname)">
-  <input type="text" id="phone" placeholder="Phone Number (e.g. +628123456789)">
-  <input type="email" id="email" placeholder="Email (e.g. gyoutrain@gmail.com)">
+  <input type="text" id="contact" placeholder="Telegram / Phone / Email (one required)">
   <input type="password" id="password" placeholder="Create Password">
   <button onclick="registerUser()">Register</button>
   <p class="note">Already registered? Proceed to payment below.</p>
@@ -156,7 +154,7 @@ a.button:hover {
   <h3>Step 2: Payment Confirmation</h3>
   <input type="text" id="userId" placeholder="Your User ID (from registration)">
   <button onclick="sendPaymentClaim()">Send Payment Claim</button>
-  <p class="note">Admin will verify and send unlock code via Telegram/Email/Phone.</p>
+  <p class="note">Admin will verify and send unlock code via Telegram bot.</p>
 
   <div class="qr-wrap">
     <p style="font-size:14px; color:#555;">Transfer via DANA — <b>IDR 50k</b></p>
@@ -171,7 +169,7 @@ a.button:hover {
   <input type="text" id="verifyUserId" placeholder="Your User ID">
   <input type="text" id="unlockCode" placeholder="Enter Unlock Code">
   <button onclick="verifyUnlock()">Verify & Continue</button>
-  <p class="note">Unlock code is given by admin via Telegram/Email/Phone.</p>
+  <p class="note">Unlock code is given by admin via Telegram.</p>
 </div>
 
 <!-- Result -->
@@ -184,20 +182,18 @@ a.button:hover {
 <div class="social-icons">
   <a href="tel:+6285399652487" title="Call"><img src="https://cdn-icons-png.flaticon.com/512/597/597177.png"></a>
   <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
+  <a href="mailto:gyoutrain@gmail.com" title="Email"><img src="https://cdn-icons-png.flaticon.com/512/561/561127.png"></a>
   <a href="https://web.facebook.com/gyouskill/?_rdc=1&_rdr#" target="_blank" title="Facebook"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png"></a>
   <a href="https://www.instagram.com/etkyogya?igsh=cHEwZ3lycXhqNHc1" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
-  <a href="mailto:gyoutrain@gmail.com" title="Email"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png"></a>
 </div>
 
 <div class="dashboard-background"></div>
 
 <script>
 /* CONFIG - backend connection */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbypcjWy2tiCVXYh6UNn5GQSqKlkYUOGldS_977eveiBUj8ljV53qQOsQcfYJibzZf97/exec";
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwF0-bahdCpd4iRUIkjsDpDG37KTPvcVryeQoyLampVrbxCS03I6Kqd2tltASGdqw8F/exec";
 const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
 const ADMIN_CHAT_ID = "6967944435";
-const ADMIN_PHONE = "+6285399652487";
-const ADMIN_EMAIL = "gyoutrain@gmail.com";
 
 /* UI helpers */
 function showPage(id){
@@ -221,14 +217,12 @@ function restart(){ showPage("pageRegister"); }
 /* ACTIONS */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
-  const telegram = document.getElementById("telegram").value.trim() || "";
-  const phone = document.getElementById("phone").value.trim() || "";
-  const email = document.getElementById("email").value.trim() || "";
+  const contact = document.getElementById("contact").value.trim();
   const password = document.getElementById("password").value.trim();
-  if(!name || (!telegram && !phone && !email) || !password) return alert("Please fill all fields including at least one contact method.");
+  if(!name || !contact || !password) return alert("Please fill all required fields (Name, Contact, Password).");
 
   const userId = "U" + Math.floor(Math.random()*1000000);
-  const data = { action:"register", name, telegram, phone, email, password, userId };
+  const data = { action:"register", name, contact, password, userId };
 
   try{
     const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
@@ -246,19 +240,17 @@ async function registerUser(){
 
 async function sendPaymentClaim(){
   const userId = document.getElementById("userId").value.trim();
-  const name = document.getElementById("name").value.trim() || "-";
-  const telegram = document.getElementById("telegram").value.trim() || "";
-  const phone = document.getElementById("phone").value.trim() || "";
-  const email = document.getElementById("email").value.trim() || "";
-
   if(!userId) return alert("Enter your User ID.");
-  const data = { action:"paymentClaim", userId, name, telegram, phone, email };
+  const name = document.getElementById("name").value.trim() || "-";
+  const contact = document.getElementById("contact").value.trim() || "-";
+
+  const data = { action:"paymentClaim", userId, name, contact };
 
   try{
     const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      alert("💰 Payment claim sent to admin. Wait for unlock code from Telegram/Email/Phone.");
+      alert("💰 Payment claim sent to admin. Wait for unlock code from Telegram bot.");
       showPage("pageUnlock");
     } else {
       showMessage(json.message, false);
