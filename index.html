@@ -1,126 +1,252 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🩺 Nursing Prometric Simulation Test</title>
+<title>Nursing Prometric Test Portal</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f6f9fc;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-  }
-  .container {
-    max-width: 400px;
-    margin: 40px auto;
-    background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    animation: fadeIn 0.8s ease;
-  }
-  h2 { color: #2c3e50; margin-bottom: 10px; }
-  button {
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 18px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  button:hover { background: #0056b3; }
-  input {
-    width: 90%;
-    margin: 6px 0;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-  }
-  .message { margin-top: 10px; font-weight: bold; }
-  .wa-icon {
-    display: inline-flex;
-    align-items: center;
-    margin-top: 12px;
-    color: #25d366;
-    font-weight: bold;
-    text-decoration: none;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+body {
+  font-family: Arial, sans-serif;
+  background: #eef5f5;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  overflow-x: hidden;
+}
+.header {
+  background: #007b83;
+  color: white;
+  padding: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  position: relative;
+  z-index: 2;
+}
+.landing-image {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-bottom: 4px solid #007b83;
+}
+.dashboard-background {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 45%;
+  background-image: url('https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  z-index: -1;
+}
+.container {
+  max-width: 480px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.5s ease;
+}
+.container.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+button {
+  background: #007b83;
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+button:hover { background: #005f63; }
+a.button {
+  display: inline-block;
+  text-decoration: none;
+  padding: 12px 20px;
+  background: #007b83;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  margin: 8px;
+  transition: background 0.3s, transform 0.2s;
+}
+a.button:hover {
+  background: #005f63;
+  transform: scale(1.03);
+}
+.note { font-size: 13px; color: #666; margin-top: 10px; }
+.success { color: #007b83; font-weight: bold; }
+.error { color: #b00020; font-weight: bold; }
+.hidden { display: none; }
+
+/* QR area styling */
+.qr-wrap {
+  text-align: center;
+  margin-top: 12px;
+}
+.qr-wrap img {
+  width: 180px;
+  max-width: 90%;
+  border: 2px solid #007b83;
+  border-radius: 12px;
+}
+
+/* Social icons - centered bottom */
+.social-icons {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  z-index: 10;
+}
+.social-icons img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+.social-icons img:hover {
+  transform: scale(1.1);
+}
 </style>
 </head>
 <body>
-  <div id="pageRegister" class="container">
-    <h2>Register & Continue</h2>
-    <p>We will save your User ID locally. Keep it to claim payment and unlock.</p>
-    <input id="name" placeholder="Your Name"><br>
-    <input id="telegram" placeholder="Telegram / WhatsApp Contact"><br>
-    <button onclick="registerUser()">Register</button>
-    <div class="message" id="registerMsg"></div>
-  </div>
 
-  <div id="pagePayment" class="container" style="display:none">
-    <h2>Manual Payment</h2>
-    <p>Send IDR 50,000 to DANA static QR (scan below).</p>
-    <img src="https://i.ibb.co/G9yBvYk/dana-qr.png" width="200" alt="DANA QR"><br><br>
-    <button onclick="sendPaymentClaim()">Claim Payment</button><br>
-    <a class="wa-icon" href="https://wa.me/62853996587" target="_blank">💬 Chat Admin (WA)</a>
-    <div class="message" id="paymentMsg"></div>
-  </div>
+<div class="header">🩺 Nursing Prometric Simulation Test</div>
 
-  <div id="pageUnlock" class="container" style="display:none">
-    <h2>Enter Unlock Code</h2>
-    <p>After admin verification, enter your unlock code to open the full test.</p>
-    <input id="unlockCodeInput" placeholder="Enter Special Code">
-    <button onclick="verifyUnlock()">Unlock</button>
-    <div class="message" id="unlockMsg"></div>
+<img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
+
+<h2 style="margin-top:20px;">Welcome to Nursing Prometric Simulation Test</h2>
+<p>Try the demo first or continue to the full 500-item test to master your skills!</p>
+
+<a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
+<a class="button" id="continueFullTestButton" onclick="showPage('pageRegister')">🔑 Continue Full Test</a>
+
+<!-- Step 1 -->
+<div class="container hidden" id="pageRegister">
+  <h3>Step 1: Registration</h3>
+  <input type="text" id="name" placeholder="Full Name">
+  <input type="text" id="telegram" placeholder="Telegram Username (e.g. @yourname)">
+  <input type="password" id="password" placeholder="Create Password">
+  <button onclick="registerUser()">Register</button>
+  <p class="note">Already registered? Proceed to payment below.</p>
+</div>
+
+<!-- Step 2 -->
+<div class="container hidden" id="pagePayment">
+  <h3>Step 2: Payment Confirmation</h3>
+  <input type="text" id="userId" placeholder="Your User ID (from registration)">
+  <button onclick="sendPaymentClaim()">Send Payment Claim</button>
+  <p class="note">Admin will verify and send unlock code via Telegram bot.</p>
+
+  <div class="qr-wrap">
+    <p style="font-size:14px; color:#555;">Transfer via DANA — <b>IDR 50k</b></p>
+    <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/dana_qr.png" alt="Dana QR">
+    <p style="font-size:13px; color:#666; margin-top:5px;">Use your banking app to scan the QR and complete payment</p>
   </div>
+</div>
+
+<!-- Step 3 -->
+<div class="container hidden" id="pageUnlock">
+  <h3>Step 3: Enter Unlock Code</h3>
+  <input type="text" id="verifyUserId" placeholder="Your User ID">
+  <input type="text" id="unlockCode" placeholder="Enter Unlock Code">
+  <button onclick="verifyUnlock()">Verify & Continue</button>
+  <p class="note">Unlock code is given by admin via Telegram.</p>
+</div>
+
+<!-- Result -->
+<div class="container hidden" id="pageResult">
+  <h3 id="resultText">...</h3>
+  <button onclick="restart()">⟲ Restart</button>
+</div>
+
+<!-- Social icons centered bottom -->
+<div class="social-icons">
+  <a href="tel:+6285399652487" title="Call"><img src="https://cdn-icons-png.flaticon.com/512/597/597177.png"></a>
+  <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
+  <a href="https://web.facebook.com/gyouskill/?_rdc=1&_rdr#" target="_blank" title="Facebook"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png"></a>
+  <a href="https://www.instagram.com/etkyogya?igsh=cHEwZ3lycXhqNHc1" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
+</div>
+
+<div class="dashboard-background"></div>
 
 <script>
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzEka6EXARzvHbWM13kE8hTDLc5rjjham6BSDBx02e1-uq5eI43lpcW8meg8Pd-pJxp/exec"; // <-- Replace with your Apps Script deployment URL
+/* CONFIG - backend connection */
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzEka6EXARzvHbWM13kE8hTDLc5rjjham6BSDBx02e1-uq5eI43lpcW8meg8Pd-pJxp/exec";
+const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
+const ADMIN_CHAT_ID = "6967944435";
 
+/* UI helpers */
 function showPage(id){
-  document.querySelectorAll('.container').forEach(e=>e.style.display='none');
-  document.getElementById(id).style.display='block';
+  document.querySelectorAll('.container').forEach(c => {
+    c.classList.add('hidden');
+    c.classList.remove('show');
+  });
+  const el = document.getElementById(id);
+  el.classList.remove('hidden');
+  setTimeout(()=>el.classList.add('show'), 50);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
-function showMessage(msg, ok=true){
-  const el = document.querySelector('.message');
-  el.style.color = ok ? "green" : "red";
-  el.textContent = msg;
+function showMessage(text, success=true){
+  const el = document.getElementById("resultText");
+  el.textContent = text;
+  el.className = success ? "success" : "error";
+  showPage("pageResult");
 }
+function restart(){ showPage("pageRegister"); }
 
+/* ACTIONS */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
   const telegram = document.getElementById("telegram").value.trim();
-  if(!name || !telegram) return alert("Please fill name and contact.");
+  const password = document.getElementById("password").value.trim();
+  if(!name || !telegram || !password) return alert("Please fill all fields.");
 
-  const data = { action:"register", name, telegram };
-  const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
-  const json = await res.json();
-  if(json.ok){
-    localStorage.setItem("userId", json.userId);
-    alert("Registered! Your User ID: " + json.userId);
-    showPage("pagePayment");
-  } else {
-    showMessage(json.message, false);
+  const userId = "U" + Math.floor(Math.random()*1000000);
+  const data = { action:"register", name, telegram, password, userId };
+
+  try{
+    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const json = await res.json();
+    if(json.ok){
+      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nSave this ID for the next step.");
+      showPage("pagePayment");
+    } else {
+      showMessage(json.message, false);
+    }
+  }catch(e){
+    showMessage("Network error: " + e.message, false);
   }
 }
 
 async function sendPaymentClaim(){
-  const userId = localStorage.getItem("userId");
-  if(!userId) return alert("Enter your User ID or register first.");
+  const userId = document.getElementById("userId").value.trim();
+  if(!userId) return alert("Enter your User ID.");
   const name = document.getElementById("name").value.trim() || "-";
   const telegram = document.getElementById("telegram").value.trim() || "-";
 
   const data = { action:"paymentClaim", userId, name, telegram };
 
   try{
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
       alert("💰 Payment claim sent to admin. Wait for unlock code from Telegram bot.");
@@ -134,10 +260,27 @@ async function sendPaymentClaim(){
 }
 
 async function verifyUnlock(){
-  const code = document.getElementById("unlockCodeInput").value.trim();
-  if(!code) return alert("Enter the unlock code first.");
-  alert("✅ Code accepted! You can now continue to the full test.");
+  const userId = document.getElementById("verifyUserId").value.trim();
+  const code = document.getElementById("unlockCode").value.trim();
+  if(!userId || !code) return alert("Fill both fields.");
+
+  const data = { action:"verifyCode", userId, code };
+  try{
+    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
+    const json = await res.json();
+    if(json.ok){
+      showMessage("✅ Code verified! Starting full test...");
+      setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
+    } else {
+      showMessage(json.message, false);
+    }
+  }catch(e){
+    showMessage("Network error: " + e.message, false);
+  }
 }
+
+/* initialize - hide all containers on start */
+document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
 </script>
 </body>
 </html>
