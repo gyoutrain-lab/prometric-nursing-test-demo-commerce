@@ -1,136 +1,235 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nursing Prometric Test Portal</title>
+
 <style>
-body{
+body {
   font-family: Arial, sans-serif;
-  background:#eef5f5;
-  text-align:center;
-  margin:0;
-  padding:0;
+  background: #eef5f5;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  overflow-x: hidden;
 }
-.header{
-  background:#007b83;
-  color:white;
-  padding:18px;
-  font-size:22px;
-  font-weight:bold;
+
+/* Header */
+.header {
+  background: #007b83;
+  color: white;
+  padding: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  position: relative;
+  z-index: 2;
 }
-.container{
-  padding:20px;
+
+/* Banner Image */
+.landing-image {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-bottom: 4px solid #007b83;
 }
-input, button{
-  padding:10px;
-  margin:6px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  width:80%;
-  max-width:320px;
+
+/* Dashboard background overlay */
+.dashboard-background {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 45%;
+  background-image: url('https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  z-index: -1;
 }
-button{
-  background:#007b83;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
+
+/* Card Containers */
+.container {
+  max-width: 480px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 1;
 }
-button:hover{
-  background:#009da3;
+
+/* Form styling */
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
 }
-.status{
-  margin-top:20px;
-  font-weight:bold;
-  color:#007b83;
+
+button {
+  background: #007b83;
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
 }
+
+button:hover { background: #005f63; }
+
+/* Link-style buttons */
+a.button {
+  display: inline-block;
+  text-decoration: none;
+  padding: 12px 20px;
+  background: #007b83;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  margin: 8px;
+  transition: background 0.3s;
+}
+a.button:hover { background: #005f63; }
+
+.note { font-size: 13px; color: #666; margin-top: 10px; }
+.success { color: #007b83; font-weight: bold; }
+.error { color: #b00020; font-weight: bold; }
+.hidden { display: none; }
 </style>
 </head>
 <body>
 
-<div class="header">🩺 Nursing Prometric Test Portal</div>
+<div class="header">🩺 Nursing Prometric Simulation Test</div>
 
-<div class="container">
-  <h3>Welcome to Nursing Prometric Simulation Test</h3>
-  <p>Try the demo or continue to the full 500-item test.</p>
+<img class="landing-image" 
+     src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" 
+     alt="Nursing Prometric Demo">
 
-  <button onclick="openDemo()">🧪 Open Demo Test</button><br>
-  <button onclick="showUnlock()">🔑 Continue Full Test</button>
+<h2 style="margin-top:20px;">Welcome to Nursing Prometric Simulation Test</h2>
+<p>Try the demo first or continue to the full 500-item test to master your skills!</p>
 
-  <div id="unlockSection" style="display:none;">
-    <p>Enter unlock code received via Telegram:</p>
-    <input id="unlockCode" placeholder="Enter your code..."><br>
-    <button onclick="unlockFull()">Continue</button>
-  </div>
+<a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🧪 Open Demo Test</a>
+<a class="button" id="continueFullTestButton" onclick="showPage('pageRegister')">🔑 Continue Full Test</a>
 
-  <hr>
-  <h4>Register or Claim Access</h4>
-  <input id="name" placeholder="Full Name"><br>
-  <input id="contact" placeholder="Telegram Username (e.g. t.me/username)"><br>
-  <input id="password" placeholder="Password"><br>
-  <button onclick="registerUser()">Register & Continue</button>
-
-  <div class="status" id="status"></div>
+<!-- Step 1 -->
+<div class="container hidden" id="pageRegister">
+  <h3>Step 1: Registration</h3>
+  <input type="text" id="name" placeholder="Full Name">
+  <input type="text" id="telegram" placeholder="Telegram Username (e.g. @yourname)">
+  <input type="password" id="password" placeholder="Create Password">
+  <button onclick="registerUser()">Register</button>
+  <p class="note">Already registered? Proceed to payment below.</p>
 </div>
 
-<script>
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbySOsFD6YnVvIVXfzpj8Wt42q2wHH-kXC4lnB1ad0tk9mDjPX8lApglSQaCovuMH-3d/exec"; // Update this line
-// Example: "https://script.google.com/macros/s/AKfycbzyatybz-xgEjrjuXfoUgye47nBpUqUIIiaz8RmT5o_qC2FJokfM6OwrD3RtpTGgKCK/exec"
+<!-- Step 2 -->
+<div class="container hidden" id="pagePayment">
+  <h3>Step 2: Payment Confirmation</h3>
+  <input type="text" id="userId" placeholder="Your User ID (from registration)">
+  <button onclick="sendPaymentClaim()">Send Payment Claim</button>
+  <p class="note">Admin will verify and send unlock code via Telegram bot.</p>
 
-function showUnlock(){ document.getElementById("unlockSection").style.display = "block"; }
-function openDemo(){ alert("Opening demo test... (demo simulation placeholder)"); }
+  <!-- Dana QR -->
+  <div style="margin-top:15px; text-align:center;">
+    <p style="font-size:14px; color:#555;">Transfer via Dana:</p>
+    <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/dana_qr.png" 
+         alt="Dana QR" 
+         style="width:180px; max-width:90%; border:2px solid #007b83; border-radius:12px;">
+    <p style="font-size:13px; color:#666; margin-top:5px;">Use your banking app to scan the QR and complete payment</p>
+  </div>
+</div>
+
+<!-- Step 3 -->
+<div class="container hidden" id="pageUnlock">
+  <h3>Step 3: Enter Unlock Code</h3>
+  <input type="text" id="verifyUserId" placeholder="Your User ID">
+  <input type="text" id="unlockCode" placeholder="Enter Unlock Code">
+  <button onclick="verifyUnlock()">Verify & Continue</button>
+  <p class="note">Unlock code is given by admin via Telegram.</p>
+</div>
+
+<!-- Result -->
+<div class="container hidden" id="pageResult">
+  <h3 id="resultText">...</h3>
+  <button onclick="restart()">⟲ Restart</button>
+</div>
+
+<div class="dashboard-background"></div>
+
+<script>
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbySOsFD6YnVvIVXfzpj8Wt42q2wHH-kXC4lnB1ad0tk9mDjPX8lApglSQaCovuMH-3d/exec";
+
+function showPage(id){
+  document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showMessage(text, success=true){
+  const el = document.getElementById("resultText");
+  el.textContent = text;
+  el.className = success ? "success" : "error";
+  showPage("pageResult");
+}
+
+function restart(){ showPage("pageRegister"); }
 
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
-  const contact = document.getElementById("contact").value.trim();
+  const telegram = document.getElementById("telegram").value.trim();
   const password = document.getElementById("password").value.trim();
-  const statusDiv = document.getElementById("status");
+  if(!name || !telegram || !password) return alert("Please fill all fields.");
 
-  if(!name || !contact || !password){
-    statusDiv.innerHTML = "⚠️ Please complete all fields.";
-    return;
-  }
-
-  statusDiv.innerHTML = "⏳ Registering...";
-  const payload = { action: "register", name, contact, password };
+  const userId = "U" + Math.floor(Math.random()*1000000);
+  const data = { action:"register", name, telegram, password, userId };
 
   try {
-    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(payload) });
-    const data = await res.json();
-    if(data.ok){
-      statusDiv.innerHTML = `✅ Registered. Your User ID: ${data.userId}<br>💳 Please pay and then claim payment.`;
-    } else {
-      statusDiv.innerHTML = "⚠️ Registration failed: " + data.message;
-    }
-  } catch(err){
-    statusDiv.innerHTML = "❌ Network error.";
-  }
+    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const json = await res.json();
+    if(json.ok){
+      alert("✅ Registered successfully!\nYour User ID: " + userId);
+      showPage("pagePayment");
+    } else showMessage(json.message,false);
+  } catch(e){ showMessage("Network error: " + e.message,false); }
 }
 
-async function unlockFull(){
+async function sendPaymentClaim(){
+  const userId = document.getElementById("userId").value.trim();
+  if(!userId) return alert("Enter your User ID.");
+  const name = document.getElementById("name").value.trim() || "-";
+  const telegram = document.getElementById("telegram").value.trim() || "-";
+
+  const data = { action:"paymentClaim", userId, name, telegram };
+  try {
+    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const json = await res.json();
+    if(json.ok){
+      alert("💰 Payment claim sent. Wait for admin approval.");
+      showPage("pageUnlock");
+    } else showMessage(json.message,false);
+  } catch(e){ showMessage("Network error: " + e.message,false); }
+}
+
+async function verifyUnlock(){
+  const userId = document.getElementById("verifyUserId").value.trim();
   const code = document.getElementById("unlockCode").value.trim();
-  const statusDiv = document.getElementById("status");
+  if(!userId || !code) return alert("Fill both fields.");
 
-  if(!code){
-    statusDiv.innerHTML = "⚠️ Enter unlock code.";
-    return;
-  }
-
-  statusDiv.innerHTML = "🔍 Verifying unlock code...";
-  const payload = { action: "verifyCode", code, userId: code.replace(/[^0-9]/g,'') };
-
+  const data = { action:"verifyCode", userId, code };
   try {
-    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(payload) });
-    const data = await res.json();
-    if(data.ok){
-      statusDiv.innerHTML = "✅ Unlock successful! Redirecting...";
-      window.location.href = "full-test.html";
-    } else {
-      statusDiv.innerHTML = "❌ " + data.message;
-    }
-  } catch(err){
-    statusDiv.innerHTML = "❌ Server not responding.";
-  }
+    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const json = await res.json();
+    if(json.ok){
+      showMessage("✅ Code verified! Starting full test...");
+      setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
+    } else showMessage(json.message,false);
+  } catch(e){ showMessage("Network error: " + e.message,false); }
 }
+
+showPage("pageRegister");
 </script>
+
 </body>
 </html>
