@@ -11,7 +11,6 @@ body{
   margin:0;
   padding:0;
 }
-
 .header{
   background:#007b83;
   color:white;
@@ -19,11 +18,9 @@ body{
   font-size:22px;
   font-weight:bold;
 }
-
 .container{
   padding:20px;
 }
-
 input, button{
   padding:10px;
   margin:6px;
@@ -32,40 +29,19 @@ input, button{
   width:80%;
   max-width:320px;
 }
-
 button{
   background:#007b83;
   color:white;
   font-weight:bold;
   cursor:pointer;
 }
-
 button:hover{
   background:#009da3;
 }
-
 .status{
   margin-top:20px;
   font-weight:bold;
   color:#007b83;
-}
-
-.qr-section{
-  margin-top:25px;
-  background:white;
-  padding:12px;
-  border-radius:12px;
-  display:inline-block;
-  box-shadow:0 0 6px rgba(0,0,0,0.1);
-}
-.qr-section img{
-  width:180px;
-  border-radius:10px;
-}
-.payment-note{
-  font-size:14px;
-  margin-top:8px;
-  color:#444;
 }
 </style>
 </head>
@@ -94,34 +70,15 @@ button:hover{
   <button onclick="registerUser()">Register & Continue</button>
 
   <div class="status" id="status"></div>
-
-  <div class="qr-section">
-    <img src="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/dana_qr.png?raw=true" alt="Dana QR Code">
-    <div class="payment-note">
-      💰 Payment IDR 50,000<br>
-      Please scan & send proof to admin after transfer.<br>
-      <b>Admin Telegram:</b> <a href="https://t.me/etkyogya" target="_blank">@etkyogya</a>
-    </div>
-  </div>
 </div>
 
 <script>
-// ===== CONFIG =====
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzyatybz-xgEjrjuXfoUgye47nBpUqUIIiaz8RmT5o_qC2FJokfM6OwrD3RtpTGgKCK/exec";
-const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
-const ADMIN_CHAT_ID = "8470308250"; // your admin Telegram ID
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzyatybz-xgEjrjuXfoUgye47nBpUqUIIiaz8RmT5o_qC2FJokfM6OwrD3RtpTGgKCK/exec"; // Update this line
+// Example: "https://script.google.com/macros/s/AKfycbzyatybz-xgEjrjuXfoUgye47nBpUqUIIiaz8RmT5o_qC2FJokfM6OwrD3RtpTGgKCK/exec"
 
-// ===== FRONT LOGIC =====
-function showUnlock(){
-  document.getElementById("unlockSection").style.display = "block";
-}
+function showUnlock(){ document.getElementById("unlockSection").style.display = "block"; }
+function openDemo(){ alert("Opening demo test... (demo simulation placeholder)"); }
 
-function openDemo(){
-  alert("Opening demo test... (demo simulation placeholder)");
-  // redirect to your demo page if available
-}
-
-// ===== REGISTER =====
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
   const contact = document.getElementById("contact").value.trim();
@@ -133,30 +90,22 @@ async function registerUser(){
     return;
   }
 
-  statusDiv.innerHTML = "⏳ Registering, please wait...";
+  statusDiv.innerHTML = "⏳ Registering...";
+  const payload = { action: "register", name, contact, password };
 
-  const payload = { mode: "register", name, contact, password };
-
-  try{
-    const res = await fetch(BACKEND_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
+  try {
+    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(payload) });
     const data = await res.json();
-
-    if(data.result === "success"){
-      statusDiv.innerHTML = "✅ Registered successfully.<br>Send payment proof to admin to receive your unlock code.";
-      sendAdminTelegram(`🧾 NEW REGISTRATION\n👤 Name: ${name}\n💬 Contact: ${contact}\n🔑 Password: ${password}\n📅 Status: Pending`);
+    if(data.ok){
+      statusDiv.innerHTML = `✅ Registered. Your User ID: ${data.userId}<br>💳 Please pay and then claim payment.`;
     } else {
-      statusDiv.innerHTML = "⚠️ " + (data.message || "Registration error.");
+      statusDiv.innerHTML = "⚠️ Registration failed: " + data.message;
     }
-  }catch(err){
-    console.error(err);
-    statusDiv.innerHTML = "❌ Network or server error.";
+  } catch(err){
+    statusDiv.innerHTML = "❌ Network error.";
   }
 }
 
-// ===== UNLOCK =====
 async function unlockFull(){
   const code = document.getElementById("unlockCode").value.trim();
   const statusDiv = document.getElementById("status");
@@ -166,39 +115,20 @@ async function unlockFull(){
     return;
   }
 
-  statusDiv.innerHTML = "🔍 Checking unlock code...";
+  statusDiv.innerHTML = "🔍 Verifying unlock code...";
+  const payload = { action: "verifyCode", code, userId: code.replace(/[^0-9]/g,'') };
 
-  const payload = { mode: "unlock", code };
-
-  try{
-    const res = await fetch(BACKEND_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-
-    if(data.result === "success"){
-      statusDiv.innerHTML = "✅ Unlock successful! Redirecting...";
-      window.location.href = "full-test.html"; // your full test page
-    } else {
-      statusDiv.innerHTML = "❌ Invalid or expired unlock code.";
-    }
-  }catch(err){
-    console.error(err);
-    statusDiv.innerHTML = "❌ Network error.";
-  }
-}
-
-// ===== TELEGRAM NOTIFICATION =====
-async function sendAdminTelegram(message){
   try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: message })
-    });
-  } catch(e){
-    console.error("Telegram notify failed", e);
+    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(payload) });
+    const data = await res.json();
+    if(data.ok){
+      statusDiv.innerHTML = "✅ Unlock successful! Redirecting...";
+      window.location.href = "full-test.html";
+    } else {
+      statusDiv.innerHTML = "❌ " + data.message;
+    }
+  } catch(err){
+    statusDiv.innerHTML = "❌ Server not responding.";
   }
 }
 </script>
