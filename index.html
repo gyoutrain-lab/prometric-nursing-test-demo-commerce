@@ -11,7 +11,6 @@ body{
   margin:0;
   padding:0;
 }
-
 .header{
   background:#007b83;
   color:white;
@@ -19,11 +18,9 @@ body{
   font-size:22px;
   font-weight:bold;
 }
-
 .container{
   padding:20px;
 }
-
 input, button{
   padding:10px;
   margin:6px;
@@ -32,22 +29,32 @@ input, button{
   width:80%;
   max-width:320px;
 }
-
 button{
   background:#007b83;
   color:white;
   font-weight:bold;
   cursor:pointer;
 }
-
 button:hover{
   background:#009da3;
 }
-
 .status{
   margin-top:20px;
   font-weight:bold;
   color:#007b83;
+}
+.payment-box{
+  margin-top:25px;
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  display:inline-block;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+}
+.payment-box img{
+  width:180px;
+  margin-top:10px;
+  border-radius:10px;
 }
 </style>
 </head>
@@ -75,6 +82,14 @@ button:hover{
   <input id="password" placeholder="Password"><br>
   <button onclick="registerUser()">Register & Continue</button>
 
+  <div class="payment-box" id="paymentBox" style="display:none;">
+    <h4>Payment to Unlock Full Test</h4>
+    <p>Transfer <b>IDR 50,000</b> using DANA QR below:</p>
+    <img src="https://github.com/gyoutrain-lab/prometric-nursing-test-demo/blob/main/dana_qr.png?raw=true" alt="DANA QR">
+    <p><b>@6281901685253</b></p>
+    <button onclick="confirmPayment()">✅ I’ve Paid / Confirm Payment</button>
+  </div>
+
   <div class="status" id="status"></div>
 </div>
 
@@ -82,7 +97,7 @@ button:hover{
 // ====== CONFIG ======
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwQzoL6zsleGVcf9ebBqiw39VNu-yuYHrKbNGnUAWj0rG46kkoWi20flWrRftI6BLFH/exec";
 const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
-const ADMIN_CHAT_ID = "6967944435"; // replace with your admin Telegram ID
+const ADMIN_CHAT_ID = "8470308250"; // Admin Telegram ID (@Etkyogyakarta)
 
 // ====== FRONT LOGIC ======
 function showUnlock(){
@@ -90,8 +105,7 @@ function showUnlock(){
 }
 
 function openDemo(){
-  alert("Opening demo test... (demo simulation placeholder)");
-  // you can redirect to your demo test HTML if available
+  alert("Opening demo test...");
 }
 
 // ====== REGISTER FUNCTION ======
@@ -100,6 +114,7 @@ async function registerUser(){
   const contact = document.getElementById("contact").value.trim();
   const password = document.getElementById("password").value.trim();
   const statusDiv = document.getElementById("status");
+  const paymentBox = document.getElementById("paymentBox");
 
   if(!name || !contact || !password){
     statusDiv.innerHTML = "⚠️ Please complete all fields.";
@@ -108,12 +123,7 @@ async function registerUser(){
 
   statusDiv.innerHTML = "⏳ Registering, please wait...";
 
-  const payload = {
-    mode: "register",
-    name,
-    contact,
-    password
-  };
+  const payload = {mode: "register", name, contact, password};
 
   try {
     const res = await fetch(BACKEND_URL, {
@@ -123,8 +133,9 @@ async function registerUser(){
     const data = await res.json();
 
     if(data.result === "success"){
-      statusDiv.innerHTML = "✅ Registered successfully. Waiting for payment verification...";
-      sendAdminTelegram(`🧾 NEW REGISTRATION\n👤 Name: ${name}\n💬 Contact: ${contact}\n🔑 Password: ${password}\nStatus: Pending`);
+      statusDiv.innerHTML = "✅ Registered. Please complete payment to unlock the test.";
+      paymentBox.style.display = "block";
+      sendAdminTelegram(`🧾 *NEW REGISTRATION*\n👤 Name: ${name}\n💬 Contact: ${contact}\n💰 Status: Pending Payment\n🔐 Will pay IDR 50,000`);
     } else {
       statusDiv.innerHTML = "⚠️ " + (data.message || "Error during registration.");
     }
@@ -132,6 +143,25 @@ async function registerUser(){
     console.error(err);
     statusDiv.innerHTML = "❌ Network error, please retry.";
   }
+}
+
+// ====== PAYMENT CONFIRMATION FUNCTION ======
+async function confirmPayment(){
+  const name = document.getElementById("name").value.trim();
+  const contact = document.getElementById("contact").value.trim();
+  const statusDiv = document.getElementById("status");
+
+  if(!name || !contact){
+    statusDiv.innerHTML = "⚠️ Please register first before confirming payment.";
+    return;
+  }
+
+  statusDiv.innerHTML = "📡 Sending confirmation to admin...";
+
+  // Notify admin manually via Telegram
+  await sendAdminTelegram(`💳 *PAYMENT CONFIRMATION*\n👤 ${name}\n💬 ${contact}\n💰 Amount: IDR 50,000\n🕒 Status: User claims payment sent.\n📌 Admin please verify on DANA and update Unlock Code manually in sheet.`);
+
+  statusDiv.innerHTML = "✅ Confirmation sent! Admin will verify your payment soon.";
 }
 
 // ====== UNLOCK FUNCTION ======
@@ -157,7 +187,7 @@ async function unlockFull(){
 
     if(data.result === "success"){
       statusDiv.innerHTML = "✅ Unlock successful! Access granted.";
-      window.location.href = "full-test.html"; // your actual full test page
+      window.location.href = "full-test.html";
     } else {
       statusDiv.innerHTML = "❌ Invalid or expired unlock code.";
     }
@@ -175,7 +205,8 @@ async function sendAdminTelegram(message){
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
         chat_id: ADMIN_CHAT_ID,
-        text: message
+        text: message,
+        parse_mode: "Markdown"
       })
     });
   } catch(e){
