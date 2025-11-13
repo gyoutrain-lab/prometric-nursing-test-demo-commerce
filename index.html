@@ -5,37 +5,28 @@
 <title>Nursing Prometric Test Portal</title>
 <style>
 body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(to bottom, #eaf6f6, #f9ffff);
+  font-family: Arial, sans-serif;
+  background: #eef5f5;
   margin: 0;
   padding: 0;
   text-align: center;
-  color: #333;
   overflow-x: hidden;
 }
-
-/* Header */
 .header {
-  background: linear-gradient(90deg, #007b83, #0097a7);
+  background: #007b83;
   color: white;
-  padding: 20px;
-  font-size: 21px;
+  padding: 18px;
+  font-size: 20px;
   font-weight: bold;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   position: relative;
   z-index: 2;
 }
-
-/* Image */
 .landing-image {
   width: 100%;
-  max-height: 260px;
+  max-height: 280px;
   object-fit: cover;
   border-bottom: 4px solid #007b83;
 }
-
-/* Background image overlay */
 .dashboard-background {
   position: absolute;
   bottom: 0;
@@ -45,18 +36,16 @@ body {
   background-image: url('https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg');
   background-size: cover;
   background-position: center;
-  opacity: 0.12;
+  opacity: 0.15;
   z-index: -1;
 }
-
-/* Card container */
 .container {
   max-width: 480px;
-  margin: 25px auto;
+  margin: 20px auto;
   background: #fff;
-  padding: 25px 22px;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
   position: relative;
   z-index: 1;
   opacity: 0;
@@ -67,31 +56,13 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
-
-h2 {
-  font-weight: 600;
-  color: #004b4d;
-  margin: 16px;
-}
-h3 {
-  color: #007b83;
-  margin-bottom: 15px;
-}
-
-/* Inputs & buttons */
 input, button {
   width: 100%;
-  padding: 13px;
+  padding: 12px;
   margin-top: 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 15px;
-  box-sizing: border-box;
-}
-input:focus {
-  outline: none;
-  border-color: #007b83;
-  box-shadow: 0 0 4px rgba(0,123,131,0.4);
 }
 button {
   background: #007b83;
@@ -99,15 +70,9 @@ button {
   font-weight: bold;
   border: none;
   cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 3px 8px rgba(0,123,131,0.3);
+  transition: background 0.3s;
 }
-button:hover {
-  background: #00656b;
-  transform: translateY(-1px);
-}
-
-/* Buttons as links */
+button:hover { background: #005f63; }
 a.button {
   display: inline-block;
   text-decoration: none;
@@ -118,32 +83,17 @@ a.button {
   font-weight: bold;
   margin: 8px;
   transition: background 0.3s, transform 0.2s;
-  box-shadow: 0 3px 8px rgba(0,123,131,0.3);
 }
 a.button:hover {
   background: #005f63;
   transform: scale(1.03);
 }
+.note { font-size: 13px; color: #666; margin-top: 10px; }
+.success { color: #007b83; font-weight: bold; }
+.error { color: #b00020; font-weight: bold; }
+.hidden { display: none; }
 
-/* Text info */
-.note {
-  font-size: 13px;
-  color: #666;
-  margin-top: 10px;
-}
-.success {
-  color: #007b83;
-  font-weight: bold;
-}
-.error {
-  color: #b00020;
-  font-weight: bold;
-}
-.hidden {
-  display: none;
-}
-
-/* QR area */
+/* QR area styling */
 .qr-wrap {
   text-align: center;
   margin-top: 12px;
@@ -153,13 +103,12 @@ a.button:hover {
   max-width: 90%;
   border: 2px solid #007b83;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* Floating social icons */
+/* Social icons - centered bottom */
 .social-icons {
   position: fixed;
-  bottom: 18px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -168,46 +117,13 @@ a.button:hover {
   z-index: 10;
 }
 .social-icons img {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   transition: transform 0.3s;
 }
 .social-icons img:hover {
-  transform: scale(1.15);
-}
-
-/* --- Responsive --- */
-@media (max-width: 600px) {
-  body {
-    font-size: 15px;
-  }
-  h2 {
-    font-size: 20px;
-    margin-top: 14px;
-  }
-  .container {
-    width: 90%;
-    padding: 20px 15px;
-    margin: 18px auto;
-  }
-  input, button {
-    font-size: 14px;
-    padding: 11px;
-  }
-  a.button {
-    width: 90%;
-    display: block;
-    margin: 10px auto;
-  }
-  .social-icons {
-    bottom: 15px;
-    gap: 15px;
-  }
-  .social-icons img {
-    width: 32px;
-    height: 32px;
-  }
+  transform: scale(1.1);
 }
 </style>
 </head>
@@ -217,7 +133,7 @@ a.button:hover {
 
 <img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
 
-<h2>Welcome to Nursing Prometric Simulation Test</h2>
+<h2 style="margin-top:20px;">Welcome to Nursing Prometric Simulation Test</h2>
 <p>Try the demo first or continue to the full 500-item test to master your skills!</p>
 
 <a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
@@ -262,10 +178,10 @@ a.button:hover {
   <button onclick="restart()">⟲ Restart</button>
 </div>
 
-<!-- Social icons -->
+<!-- Social icons centered bottom -->
 <div class="social-icons">
-  <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
   <a href="tel:+6285399652487" title="Call"><img src="https://cdn-icons-png.flaticon.com/512/597/597177.png"></a>
+  <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
   <a href="https://web.facebook.com/gyouskill/?_rdc=1&_rdr#" target="_blank" title="Facebook"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png"></a>
   <a href="https://www.instagram.com/etkyogya?igsh=cHEwZ3lycXhqNHc1" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
 </div>
@@ -273,10 +189,12 @@ a.button:hover {
 <div class="dashboard-background"></div>
 
 <script>
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxZrpK98K_Lh1oQZqj46y_i3VJcaVl9RkFWePHMp2SHeYTgAF1o0os-cn-1Bdylp370/exec";
+/* CONFIG - backend connection */
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxSJcgzkhMcC1KEacmZizEnwr6lGMg0NoJkCOTvNv9BhRFFx8CY-xsnC8FBaFsRISvV/exec";
 const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
 const ADMIN_CHAT_ID = "6967944435";
 
+/* UI helpers */
 function showPage(id){
   document.querySelectorAll('.container').forEach(c => {
     c.classList.add('hidden');
@@ -295,6 +213,7 @@ function showMessage(text, success=true){
 }
 function restart(){ showPage("pageRegister"); }
 
+/* ACTIONS */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
   const telegram = document.getElementById("telegram").value.trim();
@@ -359,6 +278,8 @@ async function verifyUnlock(){
     showMessage("Network error: " + e.message, false);
   }
 }
+
+/* initialize - hide all containers on start */
 document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
 </script>
 </body>
