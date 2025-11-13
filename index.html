@@ -95,23 +95,26 @@ a.button:hover { background: #005f63; }
   border-radius: 12px;
 }
 
-/* WhatsApp floating button */
-.whatsapp-float {
+/* Social icons - centered bottom */
+.social-icons {
   position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 9999;
-  width:56px;
-  height:56px;
-  border-radius:50%;
-  background:#25D366;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  z-index: 10;
 }
-.whatsapp-float img { width: 34px; height: 34px; }
+.social-icons img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+.social-icons img:hover {
+  transform: scale(1.1);
+}
 </style>
 </head>
 <body>
@@ -164,42 +167,22 @@ a.button:hover { background: #005f63; }
   <h3 id="resultText">...</h3>
   <button onclick="restart()">⟲ Restart</button>
 </div>
-<div class="container hidden" id="pageUnlock">
-  <h3>Step 3: Enter Unlock Code</h3>
-  <input type="text" id="verifyUserId" placeholder="Your User ID">
-  <input type="text" id="unlockCode" placeholder="Enter Unlock Code">
-  <button onclick="verifyUnlock()">Verify & Continue</button>
-</div>
 
-<div class="container hidden" id="pageResult">
-  <h3 id="resultText"></h3>
-  <button onclick="restart()">⟲ Restart</button>
-</div>
-
-<!-- Floating social icons -->
+<!-- Social icons centered bottom -->
 <div class="social-icons">
   <a href="tel:+6285399652487" title="Call"><img src="https://cdn-icons-png.flaticon.com/512/597/597177.png"></a>
   <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
   <a href="https://web.facebook.com/gyouskill/?_rdc=1&_rdr#" target="_blank" title="Facebook"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png"></a>
   <a href="https://www.instagram.com/etkyogya?igsh=cHEwZ3lycXhqNHc1" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
 </div>
+
 <div class="dashboard-background"></div>
 
-<!-- WhatsApp floating help button -->
-<a id="waHelp" class="whatsapp-float" target="_blank" title="Chat on WhatsApp">
-  <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/whatsapp_icon.png" alt="WA">
-</a>
-
 <script>
-/* CONFIG - update if you deploy a different backend URL */
+/* CONFIG - backend connection */
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbw6Y-dkUIaF7sr_W_qHyOX8CJA3MCVHyRanFQkQC5W8ETM_j214j0-p3_SJqerBtLJy/exec";
 const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
 const ADMIN_CHAT_ID = "6967944435";
-const ADMIN_WA_NUMBER = "6285399652487"; // WhatsApp number without + and spaces
-const WA_PREFILL = encodeURIComponent("Greeting, how may I help...?");
-
-// set WA link
-document.getElementById('waHelp').href = "https://wa.me/" + ADMIN_WA_NUMBER + "?text=" + WA_PREFILL;
 
 /* UI helpers */
 function showPage(id){
@@ -281,8 +264,8 @@ async function verifyUnlock(){
   }
 }
 
-/* initialize */
-showPage("pageRegister");
+/* initialize - hide all containers on start */
+document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
 </script>
 </body>
 </html>
