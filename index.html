@@ -27,18 +27,6 @@ body {
   object-fit: cover;
   border-bottom: 4px solid #007b83;
 }
-.dashboard-background {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 45%;
-  background-image: url('https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.15;
-  z-index: -1;
-}
 .container {
   max-width: 480px;
   margin: 20px auto;
@@ -49,7 +37,7 @@ body {
   position: relative;
   z-index: 1;
 }
-input, button {
+button, input {
   width: 100%;
   padding: 12px;
   margin-top: 10px;
@@ -78,40 +66,31 @@ a.button {
   transition: background 0.3s;
 }
 a.button:hover { background: #005f63; }
-.note { font-size: 13px; color: #666; margin-top: 10px; }
-.success { color: #007b83; font-weight: bold; }
-.error { color: #b00020; font-weight: bold; }
 .hidden { display: none; }
 
-/* QR area styling */
-.qr-wrap {
-  text-align: center;
-  margin-top: 12px;
-}
-.qr-wrap img {
-  width: 180px;
-  max-width: 90%;
-  border: 2px solid #007b83;
-  border-radius: 12px;
-}
-
-/* WhatsApp floating button */
-.whatsapp-float {
+/* Social floating icons */
+.social-icons {
   position: fixed;
   right: 18px;
   bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   z-index: 9999;
-  width:56px;
-  height:56px;
-  border-radius:50%;
-  background:#25D366;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
 }
-.whatsapp-float img { width: 34px; height: 34px; }
+.social-icons a {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+.social-icons a:hover { transform: scale(1.1); }
+.social-icons img { width: 28px; height: 28px; }
 </style>
 </head>
 <body>
@@ -121,150 +100,115 @@ a.button:hover { background: #005f63; }
 <img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
 
 <h2 style="margin-top:20px;">Welcome to Nursing Prometric Simulation Test</h2>
-<p>Try the demo first or continue to the full 500-item test to master your skills!</p>
 
-<a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
-<a class="button" id="continueFullTestButton" onclick="showPage('pageRegister')">🔑 Continue Full Test</a>
+<!-- Only Buttons on front -->
+<div id="frontButtons">
+  <a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Demo Test</a>
+  <a class="button" onclick="startFullTest()">🔑 Continue Test</a>
+</div>
 
-<!-- Step 1 -->
+<!-- Hidden process area -->
 <div class="container hidden" id="pageRegister">
   <h3>Step 1: Registration</h3>
   <input type="text" id="name" placeholder="Full Name">
   <input type="text" id="telegram" placeholder="Telegram Username (e.g. @yourname)">
   <input type="password" id="password" placeholder="Create Password">
   <button onclick="registerUser()">Register</button>
-  <p class="note">Already registered? Proceed to payment below.</p>
 </div>
 
-<!-- Step 2 -->
 <div class="container hidden" id="pagePayment">
-  <h3>Step 2: Payment Confirmation</h3>
-  <input type="text" id="userId" placeholder="Your User ID (from registration)">
+  <h3>Step 2: Payment</h3>
+  <input type="text" id="userId" placeholder="Your User ID">
   <button onclick="sendPaymentClaim()">Send Payment Claim</button>
-  <p class="note">Admin will verify and send unlock code via Telegram bot.</p>
-
-  <div class="qr-wrap">
-    <p style="font-size:14px; color:#555;">Transfer via DANA — <b>IDR 50k</b></p>
-    <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/dana_qr.png" alt="Dana QR">
-    <p style="font-size:13px; color:#666; margin-top:5px;">Use your banking app to scan the QR and complete payment</p>
+  <div style="margin-top:10px;">
+    <p style="font-size:14px;color:#555;">Transfer via DANA — <b>IDR 50k</b></p>
+    <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/dana_qr.png" style="width:180px;border-radius:12px;border:2px solid #007b83;">
   </div>
 </div>
 
-<!-- Step 3 -->
 <div class="container hidden" id="pageUnlock">
   <h3>Step 3: Enter Unlock Code</h3>
   <input type="text" id="verifyUserId" placeholder="Your User ID">
   <input type="text" id="unlockCode" placeholder="Enter Unlock Code">
   <button onclick="verifyUnlock()">Verify & Continue</button>
-  <p class="note">Unlock code is given by admin via Telegram.</p>
 </div>
 
-<!-- Result -->
 <div class="container hidden" id="pageResult">
-  <h3 id="resultText">...</h3>
+  <h3 id="resultText"></h3>
   <button onclick="restart()">⟲ Restart</button>
 </div>
 
-<div class="dashboard-background"></div>
-
-<!-- WhatsApp floating help button -->
-<a id="waHelp" class="whatsapp-float" target="_blank" title="Chat on WhatsApp">
-  <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/whatsapp_icon.png" alt="WA">
-</a>
+<!-- Floating social icons -->
+<div class="social-icons">
+  <a href="tel:+6285399652487" title="Call"><img src="https://cdn-icons-png.flaticon.com/512/597/597177.png"></a>
+  <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
+  <a href="https://web.facebook.com/gyouskill/?_rdc=1&_rdr#" target="_blank" title="Facebook"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png"></a>
+  <a href="https://www.instagram.com/etkyogya?igsh=cHEwZ3lycXhqNHc1" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
+</div>
 
 <script>
-/* CONFIG - update if you deploy a different backend URL */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzkXmvYl7c7QWExosuiNSS_Z78BRNy-rlc1CcfYXiWYeyS3uRFT5OWHVCSx9IbDstB8/exec";
-const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
-const ADMIN_CHAT_ID = "6967944435";
-const ADMIN_WA_NUMBER = "6285399652487"; // WhatsApp number without + and spaces
-const WA_PREFILL = encodeURIComponent("Greeting, how may I help...?");
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxC3VucJe-WAfUvpZ-Ctx9MxoN-5YktqxkgR78iNHIMi0f2Of-YlL8Mb3NRQvvNNj4A/exec";
 
-// set WA link
-document.getElementById('waHelp').href = "https://wa.me/" + ADMIN_WA_NUMBER + "?text=" + WA_PREFILL;
-
-/* UI helpers */
-function showPage(id){
-  document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
+function startFullTest(){
+  document.getElementById("frontButtons").classList.add("hidden");
+  document.getElementById("pageRegister").classList.remove("hidden");
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 function showMessage(text, success=true){
   const el = document.getElementById("resultText");
   el.textContent = text;
   el.className = success ? "success" : "error";
-  showPage("pageResult");
+  document.getElementById("pageResult").classList.remove("hidden");
 }
-function restart(){ showPage("pageRegister"); }
+
+function restart(){
+  document.querySelectorAll('.container').forEach(c=>c.classList.add('hidden'));
+  document.getElementById("frontButtons").classList.remove("hidden");
+}
 
 /* ACTIONS */
 async function registerUser(){
-  const name = document.getElementById("name").value.trim();
-  const telegram = document.getElementById("telegram").value.trim();
-  const password = document.getElementById("password").value.trim();
-  if(!name || !telegram || !password) return alert("Please fill all fields.");
-
+  const name = nameEl.value.trim(), telegram = telegramEl.value.trim(), password = passEl.value.trim();
+  if(!name||!telegram||!password) return alert("Please fill all fields.");
   const userId = "U" + Math.floor(Math.random()*1000000);
-  const data = { action:"register", name, telegram, password, userId };
-
+  const data = {action:"register", name, telegram, password, userId};
   try{
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const res = await fetch(BACKEND_URL,{method:"POST",body:JSON.stringify(data)});
     const json = await res.json();
-    if(json.ok){
-      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nSave this ID for the next step.");
-      showPage("pagePayment");
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
+    if(json.ok){ alert("✅ Registered! Your User ID: "+userId); showPage("pagePayment"); }
+    else showMessage(json.message,false);
+  }catch(e){ showMessage("Network error: "+e.message,false); }
 }
-
+function showPage(id){
+  document.querySelectorAll('.container').forEach(c=>c.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
 async function sendPaymentClaim(){
   const userId = document.getElementById("userId").value.trim();
   if(!userId) return alert("Enter your User ID.");
-  const name = document.getElementById("name").value.trim() || "-";
-  const telegram = document.getElementById("telegram").value.trim() || "-";
-
-  const data = { action:"paymentClaim", userId, name, telegram };
-
+  const data = {action:"paymentClaim", userId};
   try{
-    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
+    const res = await fetch(BACKEND_URL,{method:"POST",body:JSON.stringify(data)});
     const json = await res.json();
-    if(json.ok){
-      alert("💰 Payment claim sent to admin. Wait for unlock code from Telegram bot.");
-      showPage("pageUnlock");
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
+    if(json.ok){ alert("💰 Payment claim sent. Wait for unlock code."); showPage("pageUnlock"); }
+    else showMessage(json.message,false);
+  }catch(e){ showMessage("Network error: "+e.message,false); }
 }
-
 async function verifyUnlock(){
-  const userId = document.getElementById("verifyUserId").value.trim();
-  const code = document.getElementById("unlockCode").value.trim();
-  if(!userId || !code) return alert("Fill both fields.");
-
-  const data = { action:"verifyCode", userId, code };
+  const userId=document.getElementById("verifyUserId").value.trim();
+  const code=document.getElementById("unlockCode").value.trim();
+  if(!userId||!code) return alert("Fill both fields.");
+  const data={action:"verifyCode",userId,code};
   try{
-    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
-    const json = await res.json();
+    const res=await fetch(BACKEND_URL,{method:"POST",body:JSON.stringify(data)});
+    const json=await res.json();
     if(json.ok){
-      showMessage("✅ Code verified! Starting full test...");
-      setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
+      showMessage("✅ Verified! Starting full test...");
+      setTimeout(()=>{window.location.href="fulltest.html";},2000);
+    } else showMessage(json.message,false);
+  }catch(e){ showMessage("Network error: "+e.message,false); }
 }
-
-/* initialize */
-showPage("pageRegister");
 </script>
 </body>
 </html>
