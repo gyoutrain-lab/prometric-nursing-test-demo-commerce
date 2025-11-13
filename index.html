@@ -3,7 +3,6 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nursing Prometric Test Portal</title>
-
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -13,8 +12,6 @@ body {
   text-align: center;
   overflow-x: hidden;
 }
-
-/* Header */
 .header {
   background: #007b83;
   color: white;
@@ -24,18 +21,14 @@ body {
   position: relative;
   z-index: 2;
 }
-
-/* Banner Image */
 .landing-image {
   width: 100%;
   max-height: 280px;
   object-fit: cover;
   border-bottom: 4px solid #007b83;
 }
-
-/* Dashboard background overlay */
 .dashboard-background {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
@@ -46,8 +39,6 @@ body {
   opacity: 0.15;
   z-index: -1;
 }
-
-/* Card Containers */
 .container {
   max-width: 480px;
   margin: 20px auto;
@@ -58,8 +49,6 @@ body {
   position: relative;
   z-index: 1;
 }
-
-/* Form styling */
 input, button {
   width: 100%;
   padding: 12px;
@@ -68,7 +57,6 @@ input, button {
   border: 1px solid #ccc;
   font-size: 15px;
 }
-
 button {
   background: #007b83;
   color: white;
@@ -77,10 +65,7 @@ button {
   cursor: pointer;
   transition: background 0.3s;
 }
-
 button:hover { background: #005f63; }
-
-/* Link-style buttons */
 a.button {
   display: inline-block;
   text-decoration: none;
@@ -93,25 +78,52 @@ a.button {
   transition: background 0.3s;
 }
 a.button:hover { background: #005f63; }
-
 .note { font-size: 13px; color: #666; margin-top: 10px; }
 .success { color: #007b83; font-weight: bold; }
 .error { color: #b00020; font-weight: bold; }
 .hidden { display: none; }
+
+/* QR area styling */
+.qr-wrap {
+  text-align: center;
+  margin-top: 12px;
+}
+.qr-wrap img {
+  width: 180px;
+  max-width: 90%;
+  border: 2px solid #007b83;
+  border-radius: 12px;
+}
+
+/* WhatsApp floating button */
+.whatsapp-float {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9999;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:#25D366;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.whatsapp-float img { width: 34px; height: 34px; }
 </style>
 </head>
 <body>
 
 <div class="header">🩺 Nursing Prometric Simulation Test</div>
 
-<img class="landing-image" 
-     src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" 
-     alt="Nursing Prometric Demo">
+<img class="landing-image" src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg" alt="Nursing Prometric Demo">
 
 <h2 style="margin-top:20px;">Welcome to Nursing Prometric Simulation Test</h2>
 <p>Try the demo first or continue to the full 500-item test to master your skills!</p>
 
-<a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🧪 Open Demo Test</a>
+<a class="button" href="https://gyoutrain-lab.github.io/prometric-nursing-test-demo/" target="_blank">🩺 Open Demo Test</a>
 <a class="button" id="continueFullTestButton" onclick="showPage('pageRegister')">🔑 Continue Full Test</a>
 
 <!-- Step 1 -->
@@ -131,12 +143,9 @@ a.button:hover { background: #005f63; }
   <button onclick="sendPaymentClaim()">Send Payment Claim</button>
   <p class="note">Admin will verify and send unlock code via Telegram bot.</p>
 
-  <!-- Dana QR -->
-  <div style="margin-top:15px; text-align:center;">
-    <p style="font-size:14px; color:#555;">Transfer via Dana:</p>
-    <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/dana_qr.png" 
-         alt="Dana QR" 
-         style="width:180px; max-width:90%; border:2px solid #007b83; border-radius:12px;">
+  <div class="qr-wrap">
+    <p style="font-size:14px; color:#555;">Transfer via DANA — <b>IDR 50k</b></p>
+    <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/dana_qr.png" alt="Dana QR">
     <p style="font-size:13px; color:#666; margin-top:5px;">Use your banking app to scan the QR and complete payment</p>
   </div>
 </div>
@@ -158,24 +167,37 @@ a.button:hover { background: #005f63; }
 
 <div class="dashboard-background"></div>
 
-<script>
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbySOsFD6YnVvIVXfzpj8Wt42q2wHH-kXC4lnB1ad0tk9mDjPX8lApglSQaCovuMH-3d/exec";
+<!-- WhatsApp floating help button -->
+<a id="waHelp" class="whatsapp-float" target="_blank" title="Chat on WhatsApp">
+  <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/whatsapp_icon.png" alt="WA">
+</a>
 
+<script>
+/* CONFIG - update if you deploy a different backend URL */
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzkXmvYl7c7QWExosuiNSS_Z78BRNy-rlc1CcfYXiWYeyS3uRFT5OWHVCSx9IbDstB8/exec";
+const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
+const ADMIN_CHAT_ID = "6967944435";
+const ADMIN_WA_NUMBER = "6285399652487"; // WhatsApp number without + and spaces
+const WA_PREFILL = encodeURIComponent("Greeting, how may I help...?");
+
+// set WA link
+document.getElementById('waHelp').href = "https://wa.me/" + ADMIN_WA_NUMBER + "?text=" + WA_PREFILL;
+
+/* UI helpers */
 function showPage(id){
   document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 function showMessage(text, success=true){
   const el = document.getElementById("resultText");
   el.textContent = text;
   el.className = success ? "success" : "error";
   showPage("pageResult");
 }
-
 function restart(){ showPage("pageRegister"); }
 
+/* ACTIONS */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
   const telegram = document.getElementById("telegram").value.trim();
@@ -185,14 +207,18 @@ async function registerUser(){
   const userId = "U" + Math.floor(Math.random()*1000000);
   const data = { action:"register", name, telegram, password, userId };
 
-  try {
+  try{
     const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      alert("✅ Registered successfully!\nYour User ID: " + userId);
+      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nSave this ID for the next step.");
       showPage("pagePayment");
-    } else showMessage(json.message,false);
-  } catch(e){ showMessage("Network error: " + e.message,false); }
+    } else {
+      showMessage(json.message, false);
+    }
+  }catch(e){
+    showMessage("Network error: " + e.message, false);
+  }
 }
 
 async function sendPaymentClaim(){
@@ -202,14 +228,19 @@ async function sendPaymentClaim(){
   const telegram = document.getElementById("telegram").value.trim() || "-";
 
   const data = { action:"paymentClaim", userId, name, telegram };
-  try {
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+
+  try{
+    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      alert("💰 Payment claim sent. Wait for admin approval.");
+      alert("💰 Payment claim sent to admin. Wait for unlock code from Telegram bot.");
       showPage("pageUnlock");
-    } else showMessage(json.message,false);
-  } catch(e){ showMessage("Network error: " + e.message,false); }
+    } else {
+      showMessage(json.message, false);
+    }
+  }catch(e){
+    showMessage("Network error: " + e.message, false);
+  }
 }
 
 async function verifyUnlock(){
@@ -218,18 +249,22 @@ async function verifyUnlock(){
   if(!userId || !code) return alert("Fill both fields.");
 
   const data = { action:"verifyCode", userId, code };
-  try {
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+  try{
+    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
       showMessage("✅ Code verified! Starting full test...");
       setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
-    } else showMessage(json.message,false);
-  } catch(e){ showMessage("Network error: " + e.message,false); }
+    } else {
+      showMessage(json.message, false);
+    }
+  }catch(e){
+    showMessage("Network error: " + e.message, false);
+  }
 }
 
+/* initialize */
 showPage("pageRegister");
 </script>
-
 </body>
 </html>
