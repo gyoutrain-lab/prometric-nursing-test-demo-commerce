@@ -188,9 +188,12 @@ a.button:hover {
 
 <div class="dashboard-background"></div>
 
+<!-- Correct answer sound -->
+<audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+
 <script>
 /* CONFIG - backend connection */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxSJcgzkhMcC1KEacmZizEnwr6lGMg0NoJkCOTvNv9BhRFFx8CY-xsnC8FBaFsRISvV/exec";
+const BACKEND_URL = "hhttps://script.google.com/macros/s/AKfycbxXwBIVS4bUKWQ76m8AGYK9MG4y1xDz3SvOKW-YkdqbZG_xF9KDdASMTx_22Gs7b44/exec";
 const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
 const ADMIN_CHAT_ID = "6967944435";
 
@@ -213,6 +216,12 @@ function showMessage(text, success=true){
 }
 function restart(){ showPage("pageRegister"); }
 
+/* play correct answer sound */
+function playCorrectSound(){ 
+  const snd = document.getElementById("correctSound");
+  if(snd){ snd.currentTime = 0; snd.play(); }
+}
+
 /* ACTIONS */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
@@ -229,6 +238,7 @@ async function registerUser(){
     if(json.ok){
       alert("✅ Registered successfully!\nYour User ID: " + userId + "\nSave this ID for the next step.");
       showPage("pagePayment");
+      playCorrectSound();  // added sound on success
     } else {
       showMessage(json.message, false);
     }
@@ -270,6 +280,7 @@ async function verifyUnlock(){
     const json = await res.json();
     if(json.ok){
       showMessage("✅ Code verified! Starting full test...");
+      playCorrectSound(); // added sound on success
       setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
     } else {
       showMessage(json.message, false);
