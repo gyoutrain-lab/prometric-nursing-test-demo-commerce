@@ -89,13 +89,11 @@ a.button:hover { background:#005f63; transform:scale(1.03); }
 <div class="dashboard-background"></div>
 
 <script>
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxFhegGJPxJma_ftpW-Y9WBbygLpfMr6WIxtG-kTtZzNQIhuwXEy-rWpYZePQ_Yicje/exec";
+const BACKEND_URL = "PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE";
 
 /* UI helpers */
 function showPage(id){
-  document.querySelectorAll('.container').forEach(c=>{
-    c.classList.add('hidden'); c.classList.remove('show');
-  });
+  document.querySelectorAll('.container').forEach(c=>{ c.classList.add('hidden'); c.classList.remove('show'); });
   const el=document.getElementById(id);
   el.classList.remove('hidden');
   setTimeout(()=>el.classList.add('show'),50);
@@ -160,7 +158,6 @@ async function verifyUnlock(){
   }catch(e){ showMessage("Network error: "+e.message,false); }
 }
 
-/* Hide containers initially */
 document.querySelectorAll('.container').forEach(c=>c.classList.add('hidden'));
 </script>
 
