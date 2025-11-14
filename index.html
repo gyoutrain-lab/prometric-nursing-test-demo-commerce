@@ -91,14 +91,17 @@ a.button:hover { background:#005f63; transform:scale(1.03); }
 <script>
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyjg3Mh_-Hql5FoWuX_3Suuz4XnKuyGNB3cC9s7nLewud2y00aBUzGwAYVskYMjUzw/exec";
 
-/* Safe fetch wrapper */
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyjg3Mh_-Hql5FoWuX_3Suuz4XnKuyGNB3cC9s7nLewud2y00aBUzGwAYVskYMjUzw/exec";
+
 async function safeFetchJSON(url, options){
-  try{
+  try {
     const res = await fetch(url, options);
     const text = await res.text();
-    if(text.trim().startsWith("<")) throw new Error("Backend returned HTML. Use deployed Web App URL.");
+    if(text.trim().startsWith("<")) throw new Error("Backend returned HTML, not JSON. Check deployment URL.");
     return JSON.parse(text);
-  }catch(e){ throw e; }
+  } catch(e) {
+    throw e;
+  }
 }
 
 /* UI helpers */
