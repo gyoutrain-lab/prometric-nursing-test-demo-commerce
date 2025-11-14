@@ -91,6 +91,18 @@ a.button:hover { background:#005f63; transform:scale(1.03); }
 <script>
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxFhegGJPxJma_ftpW-Y9WBbygLpfMr6WIxtG-kTtZzNQIhuwXEy-rWpYZePQ_Yicje/exec";
 
+/* Safe fetch wrapper to prevent HTML/JSON errors */
+async function safeFetchJSON(url, options){
+  try{
+    const res = await fetch(url, options);
+    const text = await res.text();
+    if(text.trim().startsWith("<")){
+      throw new Error("Backend returned HTML. Make sure BACKEND_URL is the deployed Web App URL.");
+    }
+    return JSON.parse(text);
+  }catch(e){ throw e; }
+}
+
 /* UI helpers */
 function showPage(id){
   document.querySelectorAll('.container').forEach(c=>{ c.classList.add('hidden'); c.classList.remove('show'); });
@@ -113,18 +125,23 @@ async function registerUser(){
   const contact=document.getElementById("contact").value.trim();
   const password=document.getElementById("password").value.trim();
   if(!name||!contact||!password) return alert("Please fill all fields.");
+
   const userId="U"+Math.floor(Math.random()*1000000);
   const data={action:"register",name,contact,password,userId};
+
   try{
-    const res=await fetch(BACKEND_URL,{ method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(data) });
-    const json=await res.json();
+    const json = await safeFetchJSON(BACKEND_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(data)
+    });
     if(json.ok){
       alert("✅ Registered successfully!\nYour User ID: "+userId+"\nUse this ID in Step 2.");
       showPage("pagePayment");
       document.getElementById("userId").value=userId;
       document.getElementById("verifyUserId").value=userId;
     } else showMessage(json.message,false);
-  }catch(e){ showMessage("Network error: "+e.message,false); }
+  }catch(e){ showMessage("⚠ Backend error: "+e.message,false); }
 }
 
 /* Step 2 - Payment Claim */
@@ -135,13 +152,14 @@ async function sendPaymentClaim(){
   const contact=document.getElementById("contact").value.trim();
   const data={action:"paymentClaim",userId,name,contact};
   try{
-    const res=await fetch(BACKEND_URL,{ method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(data) });
-    const json=await res.json();
-    if(json.ok){
-      alert("💰 Payment claim sent to admin.\nWait for unlock code via Telegram/WhatsApp/Email.");
-      showPage("pageUnlock");
-    } else showMessage(json.message,false);
-  }catch(e){ showMessage("Network error: "+e.message,false); }
+    const json = await safeFetchJSON(BACKEND_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(data)
+    });
+    if(json.ok){ alert("💰 Payment claim sent to admin.\nWait for unlock code via Telegram/WhatsApp/Email."); showPage("pageUnlock"); }
+    else showMessage(json.message,false);
+  }catch(e){ showMessage("⚠ Backend error: "+e.message,false); }
 }
 
 /* Step 3 - Verify Unlock Code */
@@ -151,11 +169,14 @@ async function verifyUnlock(){
   if(!userId||!code) return alert("Fill both User ID and Unlock Code.");
   const data={action:"verifyCode",userId,code};
   try{
-    const res=await fetch(BACKEND_URL,{ method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(data) });
-    const json=await res.json();
+    const json = await safeFetchJSON(BACKEND_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(data)
+    });
     if(json.ok){ showMessage("✅ Code verified! Starting full test..."); setTimeout(()=>{ window.location.href="fulltest.html"; },2000); }
     else showMessage(json.message,false);
-  }catch(e){ showMessage("Network error: "+e.message,false); }
+  }catch(e){ showMessage("⚠ Backend error: "+e.message,false); }
 }
 
 document.querySelectorAll('.container').forEach(c=>c.classList.add('hidden'));
