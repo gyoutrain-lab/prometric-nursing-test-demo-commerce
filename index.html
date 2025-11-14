@@ -211,6 +211,10 @@ function showMessage(text, success=true){
 }
 function restart(){ showPage("pageRegister"); }
 
+/* --------------------------------
+   FIXED FETCH HEADERS (ALL STEPS)
+-----------------------------------*/
+
 /* Step 1 - Register User */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
@@ -222,7 +226,12 @@ async function registerUser(){
   const data = { action:"register", name, contact, password, userId };
 
   try{
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const res = await fetch(BACKEND_URL, {
+      method:"POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(data)
+    });
+
     const json = await res.json();
     if(json.ok){
       alert("✅ Registered successfully!\nYour User ID: " + userId + "\nUse this ID in Step 2.");
@@ -246,7 +255,12 @@ async function sendPaymentClaim(){
   const data = { action:"paymentClaim", userId, name, contact };
 
   try{
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const res = await fetch(BACKEND_URL, {
+      method:"POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(data)
+    });
+
     const json = await res.json();
     if(json.ok){
       alert("💰 Payment claim sent to admin.\nWait for unlock code via Telegram/WhatsApp/Email.");
@@ -267,8 +281,14 @@ async function verifyUnlock(){
   if(!userId || !code) return alert("Fill both User ID and Unlock Code.");
 
   const data = { action:"verifyCode", userId, code };
+
   try{
-    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
+    const res = await fetch(BACKEND_URL, {
+      method:"POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(data)
+    });
+
     const json = await res.json();
     if(json.ok){
       showMessage("✅ Code verified! Starting full test...");
