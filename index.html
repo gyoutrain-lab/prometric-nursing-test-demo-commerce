@@ -93,7 +93,7 @@ a.button:hover {
 .error { color: #b00020; font-weight: bold; }
 .hidden { display: none; }
 
-/* QR area styling */
+/* QR */
 .qr-wrap {
   text-align: center;
   margin-top: 12px;
@@ -105,7 +105,7 @@ a.button:hover {
   border-radius: 12px;
 }
 
-/* Social icons - centered bottom */
+/* Social icons */
 .social-icons {
   position: fixed;
   bottom: 20px;
@@ -143,7 +143,7 @@ a.button:hover {
 <div class="container hidden" id="pageRegister">
   <h3>Step 1: Registration</h3>
   <input type="text" id="name" placeholder="Full Name">
-  <input type="text" id="contact" placeholder="Telephone # or Telegram or Email">
+  <input type="text" id="contact" placeholder="Telegram @username / WhatsApp number / Email">
   <input type="password" id="password" placeholder="Create Password">
   <button onclick="registerUser()">Register</button>
   <p class="note">Already registered? Proceed to payment below.</p>
@@ -154,12 +154,12 @@ a.button:hover {
   <h3>Step 2: Payment Confirmation</h3>
   <input type="text" id="userId" placeholder="Your User ID (from registration)">
   <button onclick="sendPaymentClaim()">Send Payment Claim</button>
-  <p class="note">Admin will verify and send unlock code via Telegram bot.</p>
+  <p class="note">Admin will verify and send unlock code via Telegram/WA/Email.</p>
 
   <div class="qr-wrap">
     <p style="font-size:14px; color:#555;">Transfer via DANA — <b>IDR 50k</b></p>
     <img src="https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/dana_qr.png" alt="Dana QR">
-    <p style="font-size:13px; color:#666; margin-top:5px;">Use your banking app to scan the QR and complete payment</p>
+    <p style="font-size:13px; color:#666; margin-top:5px;">Use your banking app to scan the QR</p>
   </div>
 </div>
 
@@ -169,7 +169,7 @@ a.button:hover {
   <input type="text" id="verifyUserId" placeholder="Your User ID">
   <input type="text" id="unlockCode" placeholder="Enter Unlock Code">
   <button onclick="verifyUnlock()">Verify & Continue</button>
-  <p class="note">Unlock code is given by admin via Telegram.</p>
+  <p class="note">Unlock code is sent by admin.</p>
 </div>
 
 <!-- Result -->
@@ -178,24 +178,23 @@ a.button:hover {
   <button onclick="restart()">⟲ Restart</button>
 </div>
 
-<!-- Social icons centered bottom -->
+<!-- Social icons bottom center -->
 <div class="social-icons">
   <a href="tel:+6285399652487" title="Call"><img src="https://cdn-icons-png.flaticon.com/512/597/597177.png"></a>
   <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
-  <a href="mailto:gyoutrain@gmail.com" target="_blank" title="Email"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png"></a>
   <a href="https://web.facebook.com/gyouskill/?_rdc=1&_rdr#" target="_blank" title="Facebook"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png"></a>
-  <a href="https://www.instagram.com/etkyogya?igsh=cHEwZ3lycXhqNHc1" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
+  <a href="https://www.instagram.com/etkyogya" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
 </div>
 
 <div class="dashboard-background"></div>
 
-<script>
-/* CONFIG - backend connection */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvgacxjxdmOEGFgkzpRwLdCs7qRb0HxSyC8HRfB0_0JL4I_oj1lq_4YvLQWgjfH99K/exec";
-const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
-const ADMIN_CHAT_ID = "6967944435";
+<audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
 
-/* UI helpers */
+<script>
+/* CONFIG */
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxQp-yIyGfpbu0GGccKAit6u5LBqOa3xLCYIls3ufsPK5Gure-MbApc23MZ8sx-Jg-r/exec";
+
+/* UI */
 function showPage(id){
   document.querySelectorAll('.container').forEach(c => {
     c.classList.add('hidden');
@@ -206,15 +205,22 @@ function showPage(id){
   setTimeout(()=>el.classList.add('show'), 50);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 function showMessage(text, success=true){
   const el = document.getElementById("resultText");
   el.textContent = text;
   el.className = success ? "success" : "error";
   showPage("pageResult");
 }
+
 function restart(){ showPage("pageRegister"); }
 
-/* ACTIONS */
+function playCorrectSound(){ 
+  const snd = document.getElementById("correctSound");
+  snd.currentTime = 0; snd.play();
+}
+
+/* ACTIONS — synchronized */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
   const contact = document.getElementById("contact").value.trim();
@@ -228,36 +234,27 @@ async function registerUser(){
     const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nSave this ID for the next step.");
+      alert("✅ Registered!\nYour User ID: " + userId);
       showPage("pagePayment");
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
+      playCorrectSound();
+    } else showMessage(json.message, false);
+  }catch(e){ showMessage("Network error: " + e.message, false); }
 }
 
 async function sendPaymentClaim(){
   const userId = document.getElementById("userId").value.trim();
   if(!userId) return alert("Enter your User ID.");
-  const name = document.getElementById("name").value.trim() || "-";
-  const contact = document.getElementById("contact").value.trim() || "-";
 
-  const data = { action:"paymentClaim", userId, name, contact };
+  const data = { action:"paymentClaim", userId };
 
   try{
     const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      alert("💰 Payment claim sent to admin. Wait for unlock code from Telegram bot.");
+      alert("💰 Payment claim sent.\nWait for unlock code.");
       showPage("pageUnlock");
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
+    } else showMessage(json.message, false);
+  }catch(e){ showMessage("Network error: " + e.message, false); }
 }
 
 async function verifyUnlock(){
@@ -266,22 +263,23 @@ async function verifyUnlock(){
   if(!userId || !code) return alert("Fill both fields.");
 
   const data = { action:"verifyCode", userId, code };
+
   try{
-    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
+    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      showMessage("✅ Code verified! Starting full test...");
-      setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
-    } else {
-      showMessage(json.message, false);
-    }
+      showMessage("✅ Code verified! Starting test...");
+      playCorrectSound();
+      setTimeout(()=>location.href="fulltest.html", 1500);
+    } else showMessage(json.message, false);
   }catch(e){
     showMessage("Network error: " + e.message, false);
   }
 }
 
-/* initialize - hide all containers on start */
+/* hide all containers initially */
 document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
 </script>
+
 </body>
 </html>
