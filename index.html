@@ -154,7 +154,7 @@ a.button:hover {
   <h3>Step 2: Payment Confirmation</h3>
   <input type="text" id="userId" placeholder="Your User ID (from registration)">
   <button onclick="sendPaymentClaim()">Send Payment Claim</button>
-  <p class="note">Admin will verify and send unlock code via Telegram bot / WA / Email.</p>
+  <p class="note">Admin will verify and send unlock code via Telegram bot.</p>
 
   <div class="qr-wrap">
     <p style="font-size:14px; color:#555;">Transfer via DANA — <b>IDR 50k</b></p>
@@ -169,7 +169,7 @@ a.button:hover {
   <input type="text" id="verifyUserId" placeholder="Your User ID">
   <input type="text" id="unlockCode" placeholder="Enter Unlock Code">
   <button onclick="verifyUnlock()">Verify & Continue</button>
-  <p class="note">Unlock code is given by admin via Telegram / WA / Email.</p>
+  <p class="note">Unlock code is given by admin via Telegram.</p>
 </div>
 
 <!-- Result -->
@@ -178,18 +178,11 @@ a.button:hover {
   <button onclick="restart()">⟲ Restart</button>
 </div>
 
-<!-- Admin panel (hidden by default, can be added as modal or page) -->
-<div class="container hidden" id="adminPanel">
-  <h3>Admin Panel</h3>
-  <div id="adminMessages" style="max-height:200px;overflow-y:auto;text-align:left;"></div>
-  <button onclick="approvePayment()">Approve Payment</button>
-</div>
-
 <!-- Social icons centered bottom -->
 <div class="social-icons">
   <a href="tel:+6285399652487" title="Call"><img src="https://cdn-icons-png.flaticon.com/512/597/597177.png"></a>
   <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
-  <a href="mailto:gyoutrain@gmail.com" title="Email"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png"></a>
+  <a href="mailto:gyoutrain@gmail.com" target="_blank" title="Email"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png"></a>
   <a href="https://web.facebook.com/gyouskill/?_rdc=1&_rdr#" target="_blank" title="Facebook"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png"></a>
   <a href="https://www.instagram.com/etkyogya?igsh=cHEwZ3lycXhqNHc1" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
 </div>
@@ -197,8 +190,8 @@ a.button:hover {
 <div class="dashboard-background"></div>
 
 <script>
-/* CONFIG */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxSAORfib8ubECt--j3XZ42lHuRGnCAYdjFqpRUn1Ygt1WQ3wZduh5QlBUXNofcbZb4/exec";
+/* CONFIG - backend connection */
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvgacxjxdmOEGFgkzpRwLdCs7qRb0HxSyC8HRfB0_0JL4I_oj1lq_4YvLQWgjfH99K/exec";
 const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
 const ADMIN_CHAT_ID = "6967944435";
 
@@ -221,7 +214,7 @@ function showMessage(text, success=true){
 }
 function restart(){ showPage("pageRegister"); }
 
-/* USER ACTIONS */
+/* ACTIONS */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
   const contact = document.getElementById("contact").value.trim();
@@ -248,19 +241,16 @@ async function registerUser(){
 async function sendPaymentClaim(){
   const userId = document.getElementById("userId").value.trim();
   if(!userId) return alert("Enter your User ID.");
+  const name = document.getElementById("name").value.trim() || "-";
   const contact = document.getElementById("contact").value.trim() || "-";
-  const data = { action:"paymentClaim", userId, contact };
+
+  const data = { action:"paymentClaim", userId, name, contact };
 
   try{
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      alert("💰 Payment claim sent to admin. Wait for unlock code.");
-      // Show admin message for testing (simulate)
-      const msgDiv = document.getElementById("adminMessages");
-      const div = document.createElement("div");
-      div.textContent = `Payment Claimed by ${userId}`;
-      msgDiv.appendChild(div);
+      alert("💰 Payment claim sent to admin. Wait for unlock code from Telegram bot.");
       showPage("pageUnlock");
     } else {
       showMessage(json.message, false);
@@ -290,34 +280,7 @@ async function verifyUnlock(){
   }
 }
 
-/* ADMIN ACTION */
-async function approvePayment() {
-  const msgDiv = document.getElementById("adminMessages");
-  const lastMsg = msgDiv.lastChild;
-  if(!lastMsg) return alert("No payment claim to approve.");
-
-  const userIdMatch = lastMsg.textContent.match(/Payment Claimed by (.+)/);
-  if(!userIdMatch) return alert("Invalid message format.");
-  const userId = userIdMatch[1];
-
-  const unlockCode = "UNLOCK-" + Math.random().toString(36).substring(2,8).toUpperCase();
-  const data = { action: "approvePayment", userId, unlockCode };
-
-  try{
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
-    const json = await res.json();
-    if(json.ok){
-      alert(`✅ Payment approved. Unlock code ${unlockCode} sent to user.`);
-      msgDiv.removeChild(lastMsg);
-    } else {
-      alert("Error: " + json.message);
-    }
-  }catch(e){
-    alert("Network error: " + e.message);
-  }
-}
-
-/* initialize */
+/* initialize - hide all containers on start */
 document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
 </script>
 </body>
