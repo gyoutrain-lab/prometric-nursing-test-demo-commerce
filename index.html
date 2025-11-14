@@ -178,7 +178,7 @@ a.button:hover {
   <button onclick="restart()">⟲ Restart</button>
 </div>
 
-<!-- Social icons centered bottom -->
+<!-- Social icons -->
 <div class="social-icons">
   <a href="tel:+6285399652487" title="Call"><img src="https://cdn-icons-png.flaticon.com/512/597/597177.png"></a>
   <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
@@ -227,7 +227,7 @@ async function registerUser(){
     if(json.ok){
       alert("✅ Registered successfully!\nYour User ID: " + userId + "\nUse this ID in Step 2.");
       showPage("pagePayment");
-      document.getElementById("userId").value = userId; // autofill Step 2
+      document.getElementById("userId").value = userId;
     } else {
       showMessage(json.message, false);
     }
@@ -236,7 +236,7 @@ async function registerUser(){
   }
 }
 
-/* Step 2 - Payment Claim (synced with backend, generates PENDING + Unlock Code) */
+/* Step 2 - Payment Claim */
 async function sendPaymentClaim(){
   const userId = document.getElementById("userId").value.trim();
   const name = document.getElementById("name").value.trim();
@@ -251,7 +251,7 @@ async function sendPaymentClaim(){
     if(json.ok){
       alert("💰 Payment claim sent to admin.\nWait for unlock code via Telegram/WhatsApp/Email.");
       showPage("pageUnlock");
-      document.getElementById("verifyUserId").value = userId; // autofill Step 3
+      document.getElementById("verifyUserId").value = userId;
     } else {
       showMessage(json.message, false);
     }
@@ -281,7 +281,7 @@ async function verifyUnlock(){
   }
 }
 
-/* Initialize containers */
+/* FIX — do not permanently hide containers */
 document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
 </script>
 
