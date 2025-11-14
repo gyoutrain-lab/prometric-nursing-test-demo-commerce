@@ -218,7 +218,6 @@ async function registerUser(){
   const password = document.getElementById("password").value.trim();
   if(!name || !contact || !password) return alert("Please fill all fields.");
 
-  // Generate temporary User ID for new users
   const userId = "U" + Math.floor(Math.random()*1000000);
   const data = { action:"register", name, contact, password, userId };
 
@@ -226,9 +225,9 @@ async function registerUser(){
     const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nUse this ID in Step 2 to claim payment.");
+      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nUse this ID in Step 2.");
       showPage("pagePayment");
-      document.getElementById("userId").value = userId; // autofill step 2
+      document.getElementById("userId").value = userId; // autofill Step 2
     } else {
       showMessage(json.message, false);
     }
@@ -266,30 +265,6 @@ async function verifyUnlock(){
 
   const data = { action:"verifyCode", userId, code };
   try{
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
-    const json = await res.json();
-    if(json.ok){
-      showMessage("✅ Code verified! Starting full test...");
-      setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
-}
-
-/* Initialize - hide all containers on start */
-document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-</script>
-
-async function verifyUnlock(){
-  const userId = document.getElementById("verifyUserId").value.trim();
-  const code = document.getElementById("unlockCode").value.trim();
-  if(!userId || !code) return alert("Fill both fields.");
-
-  const data = { action:"verifyCode", userId, code };
-  try{
     const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
@@ -303,8 +278,9 @@ async function verifyUnlock(){
   }
 }
 
-/* initialize - hide all containers on start */
+/* Initialize containers */
 document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
 </script>
+
 </body>
 </html>
