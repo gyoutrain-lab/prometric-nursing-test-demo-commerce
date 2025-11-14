@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nursing Prometric Test Portal</title>
 <style>
+/* === Original styles preserved === */
 body {
   font-family: Arial, sans-serif;
   background: #eef5f5;
@@ -63,6 +64,7 @@ input, button {
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 15px;
+  box-sizing: border-box;
 }
 button {
   background: #007b83;
@@ -105,7 +107,7 @@ a.button:hover {
   border-radius: 12px;
 }
 
-/* Social icons - centered bottom */
+/* Social icons bottom */
 .social-icons {
   position: fixed;
   bottom: 20px;
@@ -125,6 +127,10 @@ a.button:hover {
 .social-icons img:hover {
   transform: scale(1.1);
 }
+
+/* inline small messages */
+.inline-error { color:#b00020; font-size:13px; margin-top:8px; display:none; }
+.inline-info { color:#007b83; font-size:13px; margin-top:8px; display:none; }
 </style>
 </head>
 <body>
@@ -143,7 +149,7 @@ a.button:hover {
 <div class="container hidden" id="pageRegister">
   <h3>Step 1: Registration</h3>
   <input type="text" id="name" placeholder="Full Name">
-  <input type="text" id="contact" placeholder="Telephone # or Telegram or Email">
+  <input type="text" id="contact" placeholder="Telegram @username / WhatsApp number / Email">
   <input type="password" id="password" placeholder="Create Password">
   <button onclick="registerUser()">Register</button>
   <p class="note">Already registered? Proceed to payment below.</p>
@@ -153,8 +159,9 @@ a.button:hover {
 <div class="container hidden" id="pagePayment">
   <h3>Step 2: Payment Confirmation</h3>
   <input type="text" id="userId" placeholder="Your User ID (from registration)">
-  <button onclick="sendPaymentClaim()">Send Payment Claim</button>
-  <p class="note">Admin will verify and send unlock code via Telegram bot.</p>
+  <button id="sendClaimBtn" onclick="sendPaymentClaim()">Send Payment Claim</button>
+  <div id="paymentError" class="inline-error"></div>
+  <p class="note">Admin will verify and send unlock code via Telegram/WA/Email.</p>
 
   <div class="qr-wrap">
     <p style="font-size:14px; color:#555;">Transfer via DANA — <b>IDR 50k</b></p>
@@ -169,7 +176,8 @@ a.button:hover {
   <input type="text" id="verifyUserId" placeholder="Your User ID">
   <input type="text" id="unlockCode" placeholder="Enter Unlock Code">
   <button onclick="verifyUnlock()">Verify & Continue</button>
-  <p class="note">Unlock code is given by admin via Telegram.</p>
+  <div id="unlockInfo" class="inline-error"></div>
+  <p class="note">Unlock code is sent by admin.</p>
 </div>
 
 <!-- Result -->
@@ -178,30 +186,39 @@ a.button:hover {
   <button onclick="restart()">⟲ Restart</button>
 </div>
 
-<!-- Social icons centered bottom -->
+<!-- Social icons bottom (with email restored) -->
 <div class="social-icons">
   <a href="tel:+6285399652487" title="Call"><img src="https://cdn-icons-png.flaticon.com/512/597/597177.png"></a>
   <a href="https://wa.me/6285399652487" target="_blank" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
-  <a href="mailto:gyoutrain@gmail.com" target="_blank" title="Email"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png"></a>
   <a href="https://web.facebook.com/gyouskill/?_rdc=1&_rdr#" target="_blank" title="Facebook"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png"></a>
-  <a href="https://www.instagram.com/etkyogya?igsh=cHEwZ3lycXhqNHc1" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
+  <a href="mailto:gyoutrainlab@gmail.com" title="Email"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png"></a>
+  <a href="https://www.instagram.com/etkyogya" target="_blank" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png"></a>
 </div>
 
 <div class="dashboard-background"></div>
 
-<script>
-/* CONFIG - backend connection */
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzoheHKmhqYD1fzIRxHO5rZyvldCl_FGig2z_o13oitG5OhZ7ACDUEWR5AWX4XlT6um/exec";
-const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
-const ADMIN_CHAT_ID = "6967944435";
+<!-- Correct answer sound -->
+<audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
 
-/* UI helpers */
+<script>
+/* =========================
+   Configuration (backend)
+   ========================= */
+// Use the backend URL you confirmed
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzmJxSQynVkt9lAnef9ItqHPfgUF8AouonzO1t-lm1iFS4ptQq-4AYVycxp-MR0OQk/exec";
+// The public test URL you provided
+const FULL_TEST_URL = "https://gyoutrain-lab.github.io/nursing-prometric-test-allinone500/";
+
+/* =========================
+   UI Helpers
+   ========================= */
 function showPage(id){
   document.querySelectorAll('.container').forEach(c => {
     c.classList.add('hidden');
     c.classList.remove('show');
   });
   const el = document.getElementById(id);
+  if (!el) return;
   el.classList.remove('hidden');
   setTimeout(()=>el.classList.add('show'), 50);
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -212,9 +229,38 @@ function showMessage(text, success=true){
   el.className = success ? "success" : "error";
   showPage("pageResult");
 }
-function restart(){ showPage("pageRegister"); }
+function restart(){
+  try {
+    document.getElementById("paymentError").style.display = "none";
+    document.getElementById("paymentError").innerText = "";
+    document.getElementById("unlockInfo").style.display = "none";
+    document.getElementById("unlockInfo").innerText = "";
+  } catch(e){}
+  showPage("pageRegister");
+}
+function playCorrectSound(){
+  const snd = document.getElementById("correctSound");
+  if(snd){ snd.currentTime = 0; snd.play(); }
+}
 
-/* ACTIONS */
+/* =========================
+   Backend POST Helper
+   ========================= */
+async function postToBackend(data){
+  try {
+    const res = await fetch(BACKEND_URL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+    return await res.json();
+  } catch(e){
+    return { ok:false, message: "Network error: "+e.message };
+  }
+}
+
+/* =========================
+   Registration
+   ========================= */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
   const contact = document.getElementById("contact").value.trim();
@@ -224,64 +270,111 @@ async function registerUser(){
   const userId = "U" + Math.floor(Math.random()*1000000);
   const data = { action:"register", name, contact, password, userId };
 
-  try{
-    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
-    const json = await res.json();
-    if(json.ok){
-      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nSave this ID for the next step.");
+  const json = await postToBackend(data);
+  if(json.ok){
+    alert("✅ Registered!\nYour User ID: " + userId + "\nSave this ID.");
+    localStorage.setItem("prometric_userId", userId);
+    showPage("pagePayment");
+    playCorrectSound();
+  } else {
+    showMessage(json.message || "Registration failed", false);
+  }
+}
+
+/* =========================
+   Payment Claim
+   ========================= */
+async function sendPaymentClaim(){
+  const uiVal = document.getElementById("userId") && document.getElementById("userId").value.trim();
+  const stored = localStorage.getItem("prometric_userId");
+  const userId = uiVal || stored;
+  if(!userId) return alert("Enter your User ID.");
+
+  // clear previous error
+  try { const pe = document.getElementById("paymentError"); pe.style.display='none'; pe.innerText=''; } catch(e){}
+
+  const json = await postToBackend({ action:"paymentClaim", userId });
+
+  if(json.ok){
+    alert("💰 Payment claim sent. Wait for unlock code from admin.");
+    showPage("pageUnlock");
+  } else {
+    const paymentError = document.getElementById("paymentError");
+    if(paymentError){
+      paymentError.style.display = "block";
+      paymentError.innerText = json.message || "Payment claim failed.";
       showPage("pagePayment");
     } else {
-      showMessage(json.message, false);
+      showMessage(json.message || "Payment claim failed.", false);
     }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
   }
 }
 
-async function sendPaymentClaim(){
-  const userId = document.getElementById("userId").value.trim();
-  if(!userId) return alert("Enter your User ID.");
-  const name = document.getElementById("name").value.trim() || "-";
-  const contact = document.getElementById("contact").value.trim() || "-";
-
-  const data = { action:"paymentClaim", userId, name, contact };
-
-  try{
-    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
-    const json = await res.json();
-    if(json.ok){
-      alert("💰 Payment claim sent to admin. Wait for unlock code from Telegram bot.");
-      showPage("pageUnlock");
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
-}
-
+/* =========================
+   Verify Unlock
+   ========================= */
 async function verifyUnlock(){
-  const userId = document.getElementById("verifyUserId").value.trim();
+  const userIdInput = document.getElementById("verifyUserId") && document.getElementById("verifyUserId").value.trim();
+  const userId = userIdInput || localStorage.getItem("prometric_userId");
   const code = document.getElementById("unlockCode").value.trim();
   if(!userId || !code) return alert("Fill both fields.");
 
-  const data = { action:"verifyCode", userId, code };
-  try{
-    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
-    const json = await res.json();
-    if(json.ok){
-      showMessage("✅ Code verified! Starting full test...");
-      setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
+  // clear previous
+  try { const ui = document.getElementById("unlockInfo"); ui.style.display="none"; ui.innerText=""; } catch(e){}
+
+  const json = await postToBackend({ action:"verifyCode", userId, code });
+
+  if(json.ok){
+    showMessage("✅ Code verified! Starting full test...");
+    playCorrectSound();
+    setTimeout(()=>{ window.location.href = FULL_TEST_URL; }, 1200);
+  } else {
+    const ui = document.getElementById("unlockInfo");
+    if(ui){
+      ui.style.display = "block";
+      ui.innerText = json.message || "Invalid code.";
+      showPage("pageUnlock");
     } else {
-      showMessage(json.message, false);
+      showMessage(json.message || "Invalid code.", false);
     }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
   }
 }
 
-/* initialize - hide all containers on start */
+/* =========================
+   Admin S / R helpers (keyboard)
+   ========================= */
+async function adminConfirmPaymentPrompt(){
+  const userId = prompt("Enter User ID to confirm payment (S):");
+  if(!userId) return;
+  const json = await postToBackend({ action:"paymentConfirmed", userId });
+  alert(json.ok ? "Payment confirmed." : (json.message || "Error confirming payment."));
+}
+async function adminReleaseCodePrompt(){
+  const userId = prompt("Enter User ID to release unlock code (R):");
+  if(!userId) return;
+  const json = await postToBackend({ action:"releaseCode", userId });
+  alert(json.ok ? "Unlock code released." : (json.message || "Error releasing unlock."));
+}
+
+/* Map keyboard S and R for admin convenience (no UI change) */
+document.addEventListener("keydown", function(e){
+  const tag = document.activeElement && document.activeElement.tagName;
+  if(tag === "INPUT" || tag === "TEXTAREA") return; // avoid intercept when typing
+  if(e.key && e.key.toUpperCase() === "S"){ adminConfirmPaymentPrompt(); }
+  else if(e.key && e.key.toUpperCase() === "R"){ adminReleaseCodePrompt(); }
+});
+
+/* Compatibility layer for any inline calls in your HTML (keeps original names working) */
+window.registerUser = registerUser;
+window.sendPaymentClaim = sendPaymentClaim;
+window.verifyUnlock = verifyUnlock;
+window.restart = restart;
+
+/* Hide containers initially (preserve original behavior) */
 document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+
+// Optionally show the register page on load
+showPage('pageRegister');
 </script>
 </body>
 </html>
