@@ -190,10 +190,7 @@ a.button:hover {
 <div class="dashboard-background"></div>
 
 <script>
-/* CONFIG - backend connection */
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwwD2QeHQmQFPZjrCWOeRDkMVHozajAq-YAv9Ca3EsPUR1VgCgOujhJDfWRQUTeGiw8/exec";
-const TELEGRAM_BOT_TOKEN = "8276591406:AAG60U2REgxskA0lArDhSzwRfOIefG-8VSU";
-const ADMIN_CHAT_ID = "6967944435";
 
 /* UI helpers */
 function showPage(id){
@@ -214,13 +211,14 @@ function showMessage(text, success=true){
 }
 function restart(){ showPage("pageRegister"); }
 
-/* ACTIONS */
+/* Step 1 - Register User */
 async function registerUser(){
   const name = document.getElementById("name").value.trim();
   const contact = document.getElementById("contact").value.trim();
   const password = document.getElementById("password").value.trim();
   if(!name || !contact || !password) return alert("Please fill all fields.");
 
+  // Generate temporary User ID for new users
   const userId = "U" + Math.floor(Math.random()*1000000);
   const data = { action:"register", name, contact, password, userId };
 
@@ -228,8 +226,9 @@ async function registerUser(){
     const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nSave this ID for the next step.");
+      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nUse this ID in Step 2 to claim payment.");
       showPage("pagePayment");
+      document.getElementById("userId").value = userId; // autofill step 2
     } else {
       showMessage(json.message, false);
     }
@@ -238,19 +237,18 @@ async function registerUser(){
   }
 }
 
+/* Step 2 - Payment Claim */
 async function sendPaymentClaim(){
   const userId = document.getElementById("userId").value.trim();
-  if(!userId) return alert("Enter your User ID.");
-  const name = document.getElementById("name").value.trim() || "-";
-  const contact = document.getElementById("contact").value.trim() || "-";
+  if(!userId) return alert("Enter your User ID from registration.");
 
-  const data = { action:"paymentClaim", userId, name, contact };
+  const data = { action:"paymentClaim", userId };
 
   try{
-    const res = await fetch(BACKEND_URL, { method: "POST", body: JSON.stringify(data) });
+    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
     const json = await res.json();
     if(json.ok){
-      alert("💰 Payment claim sent to admin. Wait for unlock code from Telegram bot.");
+      alert("💰 Payment claim sent to admin.\nWait for unlock code via Telegram/WhatsApp/Email.");
       showPage("pageUnlock");
     } else {
       showMessage(json.message, false);
@@ -259,6 +257,31 @@ async function sendPaymentClaim(){
     showMessage("Network error: " + e.message, false);
   }
 }
+
+/* Step 3 - Verify Unlock Code */
+async function verifyUnlock(){
+  const userId = document.getElementById("verifyUserId").value.trim();
+  const code = document.getElementById("unlockCode").value.trim();
+  if(!userId || !code) return alert("Fill both User ID and Unlock Code.");
+
+  const data = { action:"verifyCode", userId, code };
+  try{
+    const res = await fetch(BACKEND_URL, { method:"POST", body: JSON.stringify(data) });
+    const json = await res.json();
+    if(json.ok){
+      showMessage("✅ Code verified! Starting full test...");
+      setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
+    } else {
+      showMessage(json.message, false);
+    }
+  }catch(e){
+    showMessage("Network error: " + e.message, false);
+  }
+}
+
+/* Initialize - hide all containers on start */
+document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+</script>
 
 async function verifyUnlock(){
   const userId = document.getElementById("verifyUserId").value.trim();
