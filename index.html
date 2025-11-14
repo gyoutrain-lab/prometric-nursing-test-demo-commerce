@@ -4,127 +4,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nursing Prometric Test Portal</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #eef5f5;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  overflow-x: hidden;
-}
-.header {
-  background: #007b83;
-  color: white;
-  padding: 18px;
-  font-size: 20px;
-  font-weight: bold;
-  position: relative;
-  z-index: 2;
-}
-.landing-image {
-  width: 100%;
-  max-height: 280px;
-  object-fit: cover;
-  border-bottom: 4px solid #007b83;
-}
-.dashboard-background {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 45%;
-  background-image: url('https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.15;
-  z-index: -1;
-}
-.container {
-  max-width: 480px;
-  margin: 20px auto;
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  position: relative;
-  z-index: 1;
-  opacity: 0;
-  transform: translateY(15px);
-  transition: all 0.5s ease;
-}
-.container.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-input, button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-}
-button {
-  background: #007b83;
-  color: white;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-button:hover { background: #005f63; }
-a.button {
-  display: inline-block;
-  text-decoration: none;
-  padding: 12px 20px;
-  background: #007b83;
-  color: white;
-  border-radius: 8px;
-  font-weight: bold;
-  margin: 8px;
-  transition: background 0.3s, transform 0.2s;
-}
-a.button:hover {
-  background: #005f63;
-  transform: scale(1.03);
-}
-.note { font-size: 13px; color: #666; margin-top: 10px; }
-.success { color: #007b83; font-weight: bold; }
-.error { color: #b00020; font-weight: bold; }
-.hidden { display: none; }
-
-/* QR area styling */
-.qr-wrap {
-  text-align: center;
-  margin-top: 12px;
-}
-.qr-wrap img {
-  width: 180px;
-  max-width: 90%;
-  border: 2px solid #007b83;
-  border-radius: 12px;
-}
-
-/* Social icons - centered bottom */
-.social-icons {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  z-index: 10;
-}
-.social-icons img {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  transition: transform 0.3s;
-}
-.social-icons img:hover {
-  transform: scale(1.1);
-}
+body { font-family: Arial, sans-serif; background: #eef5f5; margin:0; padding:0; text-align:center; overflow-x:hidden; }
+.header { background: #007b83; color: white; padding: 18px; font-size: 20px; font-weight: bold; position: relative; z-index: 2; }
+.landing-image { width: 100%; max-height: 280px; object-fit: cover; border-bottom: 4px solid #007b83; }
+.dashboard-background { position:absolute; bottom:0; left:0; width:100%; height:45%; background-image:url('https://raw.githubusercontent.com/gyoutrain-lab/prometric-nursing-test-demo/main/icon17%20(1).jpg'); background-size:cover; background-position:center; opacity:0.15; z-index:-1; }
+.container { max-width:480px; margin:20px auto; background:#fff; padding:25px; border-radius:12px; box-shadow:0 0 10px rgba(0,0,0,0.1); position:relative; z-index:1; opacity:0; transform:translateY(15px); transition:all 0.5s ease; }
+.container.show { opacity:1; transform:translateY(0); }
+input, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ccc; font-size:15px; }
+button { background:#007b83; color:white; font-weight:bold; border:none; cursor:pointer; transition: background 0.3s; }
+button:hover { background:#005f63; }
+a.button { display:inline-block; text-decoration:none; padding:12px 20px; background:#007b83; color:white; border-radius:8px; font-weight:bold; margin:8px; transition:background 0.3s, transform 0.2s; }
+a.button:hover { background:#005f63; transform:scale(1.03); }
+.note { font-size:13px; color:#666; margin-top:10px; }
+.success { color:#007b83; font-weight:bold; }
+.error { color:#b00020; font-weight:bold; }
+.hidden { display:none; }
+.qr-wrap { text-align:center; margin-top:12px; }
+.qr-wrap img { width:180px; max-width:90%; border:2px solid #007b83; border-radius:12px; }
+.social-icons { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:20px; justify-content:center; z-index:10; }
+.social-icons img { width:34px; height:34px; border-radius:50%; transition:transform 0.3s; }
+.social-icons img:hover { transform:scale(1.1); }
 </style>
 </head>
 <body>
@@ -154,7 +53,7 @@ a.button:hover {
   <h3>Step 2: Payment Confirmation</h3>
   <input type="text" id="userId" placeholder="Your User ID (from registration)">
   <button onclick="sendPaymentClaim()">Send Payment Claim</button>
-  <p class="note">Admin will verify and send unlock code via Telegram bot.</p>
+  <p class="note">Admin will verify and send unlock code via Telegram/WhatsApp/Email.</p>
 
   <div class="qr-wrap">
     <p style="font-size:14px; color:#555;">Transfer via DANA — <b>IDR 50k</b></p>
@@ -169,7 +68,7 @@ a.button:hover {
   <input type="text" id="verifyUserId" placeholder="Your User ID">
   <input type="text" id="unlockCode" placeholder="Enter Unlock Code">
   <button onclick="verifyUnlock()">Verify & Continue</button>
-  <p class="note">Unlock code is given by admin via Telegram.</p>
+  <p class="note">Unlock code is given by admin via Telegram/WhatsApp/Email.</p>
 </div>
 
 <!-- Result -->
@@ -191,119 +90,78 @@ a.button:hover {
 
 <script>
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwdadCiUpHv3ZoIsUzyOGrEaWjYLGX_0ydOgNC7QYCdVjVy24PiQOPyJz2VwybA0qd_/exec";
-";
 
 /* UI helpers */
 function showPage(id){
-  document.querySelectorAll('.container').forEach(c => {
-    c.classList.add('hidden');
-    c.classList.remove('show');
+  document.querySelectorAll('.container').forEach(c=>{
+    c.classList.add('hidden'); c.classList.remove('show');
   });
-  const el = document.getElementById(id);
+  const el=document.getElementById(id);
   el.classList.remove('hidden');
-  setTimeout(()=>el.classList.add('show'), 50);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(()=>el.classList.add('show'),50);
+  window.scrollTo({ top:0, behavior:'smooth' });
 }
-function showMessage(text, success=true){
-  const el = document.getElementById("resultText");
-  el.textContent = text;
-  el.className = success ? "success" : "error";
+function showMessage(text,success=true){
+  const el=document.getElementById("resultText");
+  el.textContent=text;
+  el.className=success?"success":"error";
   showPage("pageResult");
 }
 function restart(){ showPage("pageRegister"); }
 
-/* --------------------------------
-   FIXED FETCH HEADERS (ALL STEPS)
------------------------------------*/
-
 /* Step 1 - Register User */
 async function registerUser(){
-  const name = document.getElementById("name").value.trim();
-  const contact = document.getElementById("contact").value.trim();
-  const password = document.getElementById("password").value.trim();
-  if(!name || !contact || !password) return alert("Please fill all fields.");
-
-  const userId = "U" + Math.floor(Math.random()*1000000);
-  const data = { action:"register", name, contact, password, userId };
-
+  const name=document.getElementById("name").value.trim();
+  const contact=document.getElementById("contact").value.trim();
+  const password=document.getElementById("password").value.trim();
+  if(!name||!contact||!password) return alert("Please fill all fields.");
+  const userId="U"+Math.floor(Math.random()*1000000);
+  const data={action:"register",name,contact,password,userId};
   try{
-    const res = await fetch(BACKEND_URL, {
-      method:"POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(data)
-    });
-
-    const json = await res.json();
+    const res=await fetch(BACKEND_URL,{ method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(data) });
+    const json=await res.json();
     if(json.ok){
-      alert("✅ Registered successfully!\nYour User ID: " + userId + "\nUse this ID in Step 2.");
+      alert("✅ Registered successfully!\nYour User ID: "+userId+"\nUse this ID in Step 2.");
       showPage("pagePayment");
-      document.getElementById("userId").value = userId;
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
+      document.getElementById("userId").value=userId;
+      document.getElementById("verifyUserId").value=userId;
+    } else showMessage(json.message,false);
+  }catch(e){ showMessage("Network error: "+e.message,false); }
 }
 
 /* Step 2 - Payment Claim */
 async function sendPaymentClaim(){
-  const userId = document.getElementById("userId").value.trim();
-  const name = document.getElementById("name").value.trim();
-  const contact = document.getElementById("contact").value.trim();
+  const userId=document.getElementById("userId").value.trim();
   if(!userId) return alert("Enter your User ID from registration.");
-
-  const data = { action:"paymentClaim", userId, name, contact };
-
+  const name=document.getElementById("name").value.trim();
+  const contact=document.getElementById("contact").value.trim();
+  const data={action:"paymentClaim",userId,name,contact};
   try{
-    const res = await fetch(BACKEND_URL, {
-      method:"POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(data)
-    });
-
-    const json = await res.json();
+    const res=await fetch(BACKEND_URL,{ method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(data) });
+    const json=await res.json();
     if(json.ok){
       alert("💰 Payment claim sent to admin.\nWait for unlock code via Telegram/WhatsApp/Email.");
       showPage("pageUnlock");
-      document.getElementById("verifyUserId").value = userId;
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
+    } else showMessage(json.message,false);
+  }catch(e){ showMessage("Network error: "+e.message,false); }
 }
 
 /* Step 3 - Verify Unlock Code */
 async function verifyUnlock(){
-  const userId = document.getElementById("verifyUserId").value.trim();
-  const code = document.getElementById("unlockCode").value.trim();
-  if(!userId || !code) return alert("Fill both User ID and Unlock Code.");
-
-  const data = { action:"verifyCode", userId, code };
-
+  const userId=document.getElementById("verifyUserId").value.trim();
+  const code=document.getElementById("unlockCode").value.trim();
+  if(!userId||!code) return alert("Fill both User ID and Unlock Code.");
+  const data={action:"verifyCode",userId,code};
   try{
-    const res = await fetch(BACKEND_URL, {
-      method:"POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(data)
-    });
-
-    const json = await res.json();
-    if(json.ok){
-      showMessage("✅ Code verified! Starting full test...");
-      setTimeout(()=>{ window.location.href="fulltest.html"; },2000);
-    } else {
-      showMessage(json.message, false);
-    }
-  }catch(e){
-    showMessage("Network error: " + e.message, false);
-  }
+    const res=await fetch(BACKEND_URL,{ method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(data) });
+    const json=await res.json();
+    if(json.ok){ showMessage("✅ Code verified! Starting full test..."); setTimeout(()=>{ window.location.href="fulltest.html"; },2000); }
+    else showMessage(json.message,false);
+  }catch(e){ showMessage("Network error: "+e.message,false); }
 }
 
-/* FIX — do not permanently hide containers */
-document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+/* Hide containers initially */
+document.querySelectorAll('.container').forEach(c=>c.classList.add('hidden'));
 </script>
 
 </body>
