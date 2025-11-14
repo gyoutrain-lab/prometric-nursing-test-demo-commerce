@@ -91,14 +91,12 @@ a.button:hover { background:#005f63; transform:scale(1.03); }
 <script>
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyjg3Mh_-Hql5FoWuX_3Suuz4XnKuyGNB3cC9s7nLewud2y00aBUzGwAYVskYMjUzw/exec";
 
-/* Safe fetch wrapper to prevent HTML/JSON errors */
+/* Safe fetch wrapper */
 async function safeFetchJSON(url, options){
   try{
     const res = await fetch(url, options);
     const text = await res.text();
-    if(text.trim().startsWith("<")){
-      throw new Error("Backend returned HTML. Make sure BACKEND_URL is the deployed Web App URL.");
-    }
+    if(text.trim().startsWith("<")) throw new Error("Backend returned HTML. Use deployed Web App URL.");
     return JSON.parse(text);
   }catch(e){ throw e; }
 }
@@ -119,7 +117,7 @@ function showMessage(text,success=true){
 }
 function restart(){ showPage("pageRegister"); }
 
-/* Step 1 - Register User */
+/* Step 1 */
 async function registerUser(){
   const name=document.getElementById("name").value.trim();
   const contact=document.getElementById("contact").value.trim();
@@ -144,7 +142,7 @@ async function registerUser(){
   }catch(e){ showMessage("⚠ Backend error: "+e.message,false); }
 }
 
-/* Step 2 - Payment Claim */
+/* Step 2 */
 async function sendPaymentClaim(){
   const userId=document.getElementById("userId").value.trim();
   if(!userId) return alert("Enter your User ID from registration.");
@@ -162,7 +160,7 @@ async function sendPaymentClaim(){
   }catch(e){ showMessage("⚠ Backend error: "+e.message,false); }
 }
 
-/* Step 3 - Verify Unlock Code */
+/* Step 3 */
 async function verifyUnlock(){
   const userId=document.getElementById("verifyUserId").value.trim();
   const code=document.getElementById("unlockCode").value.trim();
